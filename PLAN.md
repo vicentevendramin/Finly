@@ -73,7 +73,7 @@ backend/src/
 | B3 | ✅ done | `UsersModule` + `AuthModule`: `User` entity (with `role` from day one), `JwtStrategy`/`JwtAuthGuard`, register/login/me at functional parity with `authController.js` | bcrypt cost 12 kept |
 | B4 | ✅ done | `TransactionsModule`: entity, DTOs, CRUD at parity with `transactionsController.js` (month filter, ownership checks, same JSON shape — `amount` as float, `date` as `YYYY-MM-DD`) | |
 | B5 | ✅ done | Unit + e2e tests for Auth + Transactions | parity checkpoint before cutting over the frontend — verified with curl + full suite against a real Postgres |
-| B6 | ⬜ pending | `GoalsModule`: `Goal` + `GoalContribution` entities, CRUD, contribution endpoint, aggregated progress read | depends on B3 |
+| B6 | ✅ done | `GoalsModule`: `Goal` + `GoalContribution` entities, CRUD, contribution endpoint, aggregated progress read | depends on B3 — verified with unit + e2e tests incl. the hybrid manual+category-linked progress calc |
 | B7 | ⬜ pending | `ReportsModule`: balance-by-period, category breakdown, month-over-month, CSV export (`json2csv`) + PDF export (`pdfkit` — no Chromium needed) | pure queries over `Transaction`, no new entity |
 | B8 | ⬜ pending | `role` rollout + `RolesGuard` + `AdminModule` (stats, error log endpoint) + `ErrorLog` entity wired into the exception filter | |
 | B9 | ⬜ pending | `ObservabilityModule` (`/metrics`, `/health`, metrics interceptor) | `@willsoto/nestjs-prometheus` doesn't yet support Nest 12 peer deps — may need `prom-client` directly |

@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import type { AppConfig } from '../config/configuration.js';
 import { User } from '../users/entities/user.entity.js';
 import { Transaction } from '../transactions/entities/transaction.entity.js';
+import { Goal } from '../goals/entities/goal.entity.js';
+import { GoalContribution } from '../goals/entities/goal-contribution.entity.js';
 
 @Module({
   imports: [
@@ -17,7 +19,7 @@ import { Transaction } from '../transactions/entities/transaction.entity.js';
         database: configService.get('db.name', { infer: true }),
         username: configService.get('db.user', { infer: true }),
         password: configService.get('db.password', { infer: true }),
-        entities: [User, Transaction],
+        entities: [User, Transaction, Goal, GoalContribution],
         synchronize: false,
         migrationsRun: true,
         migrations: ['dist/database/migrations/*.js'],

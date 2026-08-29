@@ -2,6 +2,8 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { User } from '../users/entities/user.entity.js';
 import { Transaction } from '../transactions/entities/transaction.entity.js';
+import { Goal } from '../goals/entities/goal.entity.js';
+import { GoalContribution } from '../goals/entities/goal-contribution.entity.js';
 
 export default new DataSource({
   type: 'postgres',
@@ -10,6 +12,6 @@ export default new DataSource({
   database: process.env.DB_NAME ?? 'financeapp',
   username: process.env.DB_USER ?? 'postgres',
   password: process.env.DB_PASSWORD ?? '',
-  entities: [User, Transaction],
+  entities: [User, Transaction, Goal, GoalContribution],
   migrations: ['src/database/migrations/*.ts'],
 });

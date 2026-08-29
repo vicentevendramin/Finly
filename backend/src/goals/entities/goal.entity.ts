@@ -10,16 +10,10 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity.js';
 
-export enum TransactionType {
-  INCOME = 'income',
-  EXPENSE = 'expense',
-}
-
-@Entity('transactions')
+@Entity('goals')
 @Index(['user'])
-@Index(['user', 'date'])
-@Check('"amount" > 0')
-export class Transaction {
+@Check('"target_amount" > 0')
+export class Goal {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -28,19 +22,16 @@ export class Transaction {
   user: User;
 
   @Column()
-  description: string;
+  name: string;
 
-  @Column({ type: 'numeric', precision: 12, scale: 2 })
-  amount: string;
+  @Column({ name: 'target_amount', type: 'numeric', precision: 12, scale: 2 })
+  targetAmount: string;
 
-  @Column({ type: 'date' })
-  date: string;
+  @Column({ type: 'varchar', nullable: true })
+  category: string | null;
 
-  @Column({ type: 'enum', enum: TransactionType })
-  type: TransactionType;
-
-  @Column()
-  category: string;
+  @Column({ type: 'date', nullable: true })
+  deadline: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
