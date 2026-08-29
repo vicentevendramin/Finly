@@ -1,29 +1,31 @@
 # Finly 🌡️
-Finly (anteriormente "Meu Termômetro Financeiro") é uma aplicação web de controle financeiro pessoal, nascida como projeto de MVP (Mínimo Produto Viável) acadêmico. O objetivo principal é criar uma aplicação simples, clara e intuitiva para o controle financeiro pessoal, servindo como um substituto moderno e focado para planilhas complexas.
+Finly (formerly "Meu Termômetro Financeiro") is a full-stack personal finance web app. It started as an academic MVP project and has since grown into a fully self-hosted app — a simple, clear replacement for complex spreadsheets.
 
-O projeto foca em entregar a proposta de valor central: dar ao usuário clareza imediata sobre suas receitas e despesas com o mínimo de esforço.
+The core value proposition hasn't changed: give the user immediate clarity on income and expenses, with as little friction as possible.
 
-[Clique aqui](https://vicentevendramin.github.io/Meu-Termometro-Financeiro/) para testar o App, os serviços do Back-end estão mockados no Front-end.
+## 🎯 The Problem
+Many people try to manage their finances with spreadsheets, but find the process complex, manual, and hard to use on mobile. This leads to giving up, which brings a lack of clarity and financial stress.
 
-## 🎯 O Problema
-Muitas pessoas tentam gerenciar suas finanças com planilhas, mas acham o processo complexo, manual e difícil de acessar em dispositivos móveis. Isso leva à desistência, gerando falta de clareza e estresse financeiro.
+## ✨ The Solution
+A full-stack web app that lets the user:
+- Sign up and log in securely (JWT-based auth).
+- Log income and expenses quickly, organized by category.
+- See an immediate dashboard with the balance (income vs. expenses).
+- Set savings goals, funded either by manual contributions or automatically from income in a linked category.
+- Generate reports — balance over time, spending by category, month-over-month comparison — and export them as CSV or PDF.
+- Use the app in Portuguese or English, in light or dark mode, on desktop or mobile.
+- (Admins) Check basic usage stats and recent server errors from an admin panel.
 
-## ✨ A Solução (MVP)
-Uma aplicação web _full-stack_ que permite ao usuário:
-- Autenticar-se de forma segura.
-- Lançar receitas e despesas de forma rápida.
-- Visualizar um dashboard imediato com o balanço (Receitas x Despesas).
-
-## 🚀 Stack de Tecnologia
-- **Frontend:** React + TypeScript + Vite, TanStack Query, Zustand, i18next
+## 🚀 Tech Stack
+- **Frontend:** React + TypeScript + Vite, React Router, TanStack Query, Zustand, Tailwind CSS, i18next, Recharts
 - **Backend:** NestJS + TypeORM
 - **Database:** PostgreSQL
-- **Observabilidade:** Prometheus + Grafana
-- **Deploy:** Docker Compose (self-hosted)
+- **Observability:** Prometheus + Grafana
+- **Deployment:** Docker Compose, fully self-hosted (see `backend/README.md` for setup)
 
-## 🛠️ Metodologia e Planejamento
-- **Design de Interface (UI/UX):** Prototipação de alta fidelidade realizada no Figma.
-- **Gerenciamento de Projeto:** Metodologia ágil (Scrum) gerenciada no Trello.
-- **Arquitetura:** Cliente-servidor com API RESTful.
+## 🛠️ Methodology & Planning
+- **UI/UX Design:** High-fidelity prototyping in Figma.
+- **Project Management:** Agile (Scrum), tracked in Trello.
+- **Architecture:** Client-server with a RESTful API.
 
-_Este é um projeto acadêmico e está em desenvolvimento._
+_Started as an academic project; now actively maintained and self-hosted._
