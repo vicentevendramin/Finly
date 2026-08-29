@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-Finly (formerly "Meu Termômetro Financeiro") is a full-stack personal finance tracker (Portuguese-language UI, undergoing an English rebrand). It's a monorepo with two independent projects — `backend/` and `frontend/` — each with its own `package.json` and no shared root tooling.
+Finly (formerly "Meu Termômetro Financeiro") is a full-stack personal finance tracker. The UI is bilingual — pt-BR (default/fallback) and en-US — via i18next. It's a monorepo with two independent projects — `backend/` and `frontend/` — each with its own `package.json` and no shared root tooling.
 
-**Note:** this project went through a full refactor per `PLAN.md` at the repo root — backend (NestJS/TypeORM, all modules), the Docker/Prometheus/Grafana/frontend self-hosted stack, the entire frontend feature set, and basic frontend test coverage are all done. `PLAN.md`'s task table has the full history if you need the "why" behind a decision.
+**Note:** the full refactor described in `PLAN.md` at the repo root is complete — backend (NestJS/TypeORM, all modules), the Docker/Prometheus/Grafana/frontend self-hosted stack, the entire frontend feature set (routing, query caching, i18n, design system), the Finly rebrand, and basic test coverage on both sides are all done. `PLAN.md`'s task table has the full history if you need the "why" behind a decision.
 
-- **Frontend:** React 19 + TypeScript + Vite, styled with Tailwind CSS v4 (not yet refactored — still the original prop-drilled architecture, see below)
+- **Frontend:** React 19 + TypeScript + Vite, React Router 7 + TanStack Query + Zustand, styled with Tailwind CSS v4
 - **Backend:** NestJS 12 (ESM, Vitest, oxlint — the current `nest new` defaults) + TypeORM + PostgreSQL
 - **Auth:** JWT via `@nestjs/passport`, passwords hashed with `bcryptjs`, token stored in `localStorage` on the frontend
-- Backend has unit tests (Vitest, mocked repositories) and e2e tests (Supertest against a real Postgres); frontend has none yet.
+- Backend has unit tests (Vitest, mocked repositories) and e2e tests (Supertest against a real Postgres). Frontend has Vitest + Testing Library tests (jsdom) — intentionally basic coverage, see the frontend Architecture section.
 
 ## Commands
 
@@ -22,7 +22,9 @@ Run these from within `backend/` or `frontend/` respectively — there is no roo
 npm run start:dev        # watch mode (reads backend/.env)
 npm run build            # nest build -> dist/
 npm run test             # unit tests (Vitest, no external deps)
-npm run test:e2e         # e2e tests (Supertest) — needs a real Postgres with migrations applied
+npm run test -- src/transactions/transactions.service.spec.ts   # single unit-test file
+npm run test -- -t "computeProgress"                            # single test by name
+npm run test:e2e         # e2e tests (Supertest) — needs a real Postgres with migrations applied; rebuilds first, file parallelism disabled
 npm run migration:generate  # generate a migration from entity changes
 npm run migration:run       # apply pending migrations manually (outside Docker)
 ```
@@ -37,10 +39,14 @@ Brings up Postgres, the backend (`:3001`), Prometheus (`:9090`, scraping `backen
 
 ### Frontend (`frontend/`)
 ```bash
-npm run dev        # Vite dev server on port 3000
-npm run build      # tsc -b && vite build
-npm run lint       # eslint .
-npm run preview    # preview production build
+npm run dev         # Vite dev server on port 3000
+npm run build       # tsc -b && vite build
+npm run lint        # eslint .
+npm run preview     # preview production build
+npm run test        # Vitest run (jsdom, Testing Library)
+npm run test:watch  # Vitest watch mode
+# single file:  npm run test -- src/hooks/useTransactions.spec.tsx
+# single test:  npm run test -- -t "invalidates the goals query"
 ```
 
 ## Architecture
