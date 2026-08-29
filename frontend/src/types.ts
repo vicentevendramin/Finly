@@ -1,6 +1,7 @@
 export interface User {
   id: string;
   email: string;
+  role: 'user' | 'admin';
   name?: string; // Deixamos 'name' como opcional, mas a API não o envia
 }
 
@@ -52,4 +53,19 @@ export interface CategoryTotal {
 export interface ReportDateRange {
   from?: string;
   to?: string;
+}
+
+export interface AdminStats {
+  totalUsers: number;
+  newUsers: number;
+  totalTransactions: number;
+  transactionsInPeriod: number;
+}
+
+export interface AdminErrorLog {
+  id: string;
+  message: string;
+  path: string;
+  userId: string | null;
+  createdAt: string;
 }

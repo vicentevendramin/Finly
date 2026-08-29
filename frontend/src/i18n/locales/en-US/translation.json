@@ -11,7 +11,9 @@
     "transactions": "Transactions",
     "goals": "Goals",
     "reports": "Reports",
-    "role": "User",
+    "admin": "Admin",
+    "roleUser": "User",
+    "roleAdmin": "Administrator",
     "logout": "Log out",
     "toggleTheme": "Toggle theme",
     "openMenu": "Open menu",
@@ -130,5 +132,22 @@
     "exportCsv": "Export CSV",
     "exportPdf": "Export PDF",
     "exporting": "Exporting..."
+  },
+  "adminPage": {
+    "title": "Admin Panel",
+    "filterHint": "Filter stats by date range (doesn't affect the error log).",
+    "totalUsers": "Total users",
+    "newUsers": "New users",
+    "totalTransactions": "Total transactions",
+    "transactionsInPeriod": "Transactions in period",
+    "recentErrors": "Recent errors",
+    "loading": "Loading...",
+    "noErrors": "No errors logged.",
+    "columns": {
+      "date": "Date",
+      "path": "Route",
+      "message": "Message",
+      "user": "User"
+    }
   }
 }

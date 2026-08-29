@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink as RouterNavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, List, Target, BarChart2, Plus, LogOut } from 'lucide-react';
+import { Home, List, Target, BarChart2, Plus, LogOut, ShieldCheck } from 'lucide-react';
 import { apiService } from '../services/apiService';
 import { useAuthStore } from '../store/authStore';
 import { useUiStore } from '../store/uiStore';
@@ -97,6 +97,9 @@ const Sidebar: React.FC = () => {
           <SidebarNavItem to="/app/transactions" icon={List} label={t('sidebar.transactions')} onNavigate={closeMobileMenu} />
           <SidebarNavItem to="/app/goals" icon={Target} label={t('sidebar.goals')} onNavigate={closeMobileMenu} />
           <SidebarNavItem to="/app/reports" icon={BarChart2} label={t('sidebar.reports')} onNavigate={closeMobileMenu} />
+          {user.role === 'admin' && (
+            <SidebarNavItem to="/app/admin" icon={ShieldCheck} label={t('sidebar.admin')} onNavigate={closeMobileMenu} />
+          )}
         </nav>
 
         {/* Perfil / Logout */}
@@ -113,7 +116,9 @@ const Sidebar: React.FC = () => {
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-100" title={user.email}>
                 {user.email.length > 20 ? `${user.email.substring(0, 17)}...` : user.email}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{t('sidebar.role')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {user.role === 'admin' ? t('sidebar.roleAdmin') : t('sidebar.roleUser')}
+              </p>
             </div>
           </div>
           <button

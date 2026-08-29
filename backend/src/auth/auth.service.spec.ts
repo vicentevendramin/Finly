@@ -49,7 +49,7 @@ describe('AuthService', () => {
       );
       expect(result).toEqual({
         token: 'signed.jwt.token',
-        user: { id: '1', email: 'test@example.com' },
+        user: { id: '1', email: 'test@example.com', role: UserRole.USER },
       });
     });
 
@@ -73,7 +73,7 @@ describe('AuthService', () => {
         password: 'senha123',
       });
 
-      expect(result.user).toEqual({ id: '1', email: 'test@example.com' });
+      expect(result.user).toEqual({ id: '1', email: 'test@example.com', role: UserRole.USER });
     });
 
     it('throws UnauthorizedException when the user does not exist', async () => {
@@ -100,7 +100,7 @@ describe('AuthService', () => {
 
       const result = await authService.me(1);
 
-      expect(result).toEqual({ user: { id: '1', email: 'test@example.com' } });
+      expect(result).toEqual({ user: { id: '1', email: 'test@example.com', role: UserRole.USER } });
     });
 
     it('throws NotFoundException when the user no longer exists', async () => {

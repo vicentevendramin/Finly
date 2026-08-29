@@ -7,6 +7,8 @@ import type {
   NewContributionData,
   BalancePeriod,
   CategoryTotal,
+  AdminStats,
+  AdminErrorLog,
 } from '../types';
 
 // ─── Configuração base ────────────────────────────────────────────────────────
@@ -245,6 +247,27 @@ export const apiService = {
     if (to) params.set('to', to);
     const response = await apiFetch(`/reports/export?${params.toString()}`);
     return response.blob();
+  },
+
+  /**
+   * GET /api/admin/stats
+   */
+  getAdminStats: async (from?: string, to?: string): Promise<AdminStats> => {
+    const params = new URLSearchParams();
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const response = await apiFetch(`/admin/stats${query}`);
+    return response.json() as Promise<AdminStats>;
+  },
+
+  /**
+   * GET /api/admin/errors
+   */
+  getAdminErrors: async (limit?: number): Promise<AdminErrorLog[]> => {
+    const query = limit ? `?limit=${limit}` : '';
+    const response = await apiFetch(`/admin/errors${query}`);
+    return response.json() as Promise<AdminErrorLog[]>;
   },
 
   checkAuthStatus,

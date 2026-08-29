@@ -11,7 +11,9 @@
     "transactions": "Transações",
     "goals": "Metas",
     "reports": "Relatórios",
-    "role": "Usuário",
+    "admin": "Admin",
+    "roleUser": "Usuário",
+    "roleAdmin": "Administrador",
     "logout": "Sair",
     "toggleTheme": "Alternar tema",
     "openMenu": "Abrir menu",
@@ -130,5 +132,22 @@
     "exportCsv": "Exportar CSV",
     "exportPdf": "Exportar PDF",
     "exporting": "Exportando..."
+  },
+  "adminPage": {
+    "title": "Painel de Administração",
+    "filterHint": "Filtre as estatísticas por período (não afeta o log de erros).",
+    "totalUsers": "Total de usuários",
+    "newUsers": "Novos usuários",
+    "totalTransactions": "Total de transações",
+    "transactionsInPeriod": "Transações no período",
+    "recentErrors": "Erros recentes",
+    "loading": "Carregando...",
+    "noErrors": "Nenhum erro registrado.",
+    "columns": {
+      "date": "Data",
+      "path": "Rota",
+      "message": "Mensagem",
+      "user": "Usuário"
+    }
   }
 }

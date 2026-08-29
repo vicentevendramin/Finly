@@ -10,10 +10,12 @@ import DashboardPage from './pages/DashboardPage';
 import TransactionsPage from './pages/TransactionsPage';
 import GoalsPage from './pages/GoalsPage';
 import ReportsPage from './pages/ReportsPage';
+import AdminPage from './pages/AdminPage';
 
 import AppLayout from './layout/AppLayout';
 import ProtectedRoute from './routes/ProtectedRoute';
 import PublicOnlyRoute from './routes/PublicOnlyRoute';
+import AdminRoute from './routes/AdminRoute';
 
 function App() {
   const { t } = useTranslation();
@@ -50,6 +52,9 @@ function App() {
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="goals" element={<GoalsPage />} />
           <Route path="reports" element={<ReportsPage />} />
+          <Route element={<AdminRoute />}>
+            <Route path="admin" element={<AdminPage />} />
+          </Route>
         </Route>
       </Route>
 

@@ -7,13 +7,19 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service.js';
-import type { User } from '../users/entities/user.entity.js';
+import type { User, UserRole } from '../users/entities/user.entity.js';
 import type { RegisterDto } from './dto/register.dto.js';
 import type { LoginDto } from './dto/login.dto.js';
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  role: UserRole;
+}
+
 export interface AuthResult {
   token: string;
-  user: { id: string; email: string };
+  user: AuthUser;
 }
 
 @Injectable()
@@ -49,12 +55,12 @@ export class AuthService {
     return this.buildAuthResult(user);
   }
 
-  async me(userId: number): Promise<{ user: { id: string; email: string } }> {
+  async me(userId: number): Promise<{ user: AuthUser }> {
     const user = await this.usersService.findById(userId);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado.');
     }
-    return { user: { id: String(user.id), email: user.email } };
+    return { user: this.toAuthUser(user) };
   }
 
   private buildAuthResult(user: User): AuthResult {
@@ -63,6 +69,10 @@ export class AuthService {
       email: user.email,
       role: user.role,
     });
-    return { token, user: { id: String(user.id), email: user.email } };
+    return { token, user: this.toAuthUser(user) };
+  }
+
+  private toAuthUser(user: User): AuthUser {
+    return { id: String(user.id), email: user.email, role: user.role };
   }
 }
