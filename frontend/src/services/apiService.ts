@@ -5,6 +5,8 @@ import type {
   Goal,
   NewGoalData,
   NewContributionData,
+  BalancePeriod,
+  CategoryTotal,
 } from '../types';
 
 // ─── Configuração base ────────────────────────────────────────────────────────
@@ -195,6 +197,54 @@ export const apiService = {
       body: JSON.stringify(data),
     });
     return response.json() as Promise<Goal>;
+  },
+
+  /**
+   * GET /api/reports/balance
+   */
+  getBalanceReport: async (from?: string, to?: string): Promise<BalancePeriod[]> => {
+    const params = new URLSearchParams();
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const response = await apiFetch(`/reports/balance${query}`);
+    return response.json() as Promise<BalancePeriod[]>;
+  },
+
+  /**
+   * GET /api/reports/by-category
+   */
+  getCategoryReport: async (
+    type: 'income' | 'expense',
+    from?: string,
+    to?: string,
+  ): Promise<CategoryTotal[]> => {
+    const params = new URLSearchParams({ type });
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    const response = await apiFetch(`/reports/by-category?${params.toString()}`);
+    return response.json() as Promise<CategoryTotal[]>;
+  },
+
+  /**
+   * GET /api/reports/month-over-month
+   */
+  getMonthOverMonth: async (months?: number): Promise<BalancePeriod[]> => {
+    const query = months ? `?months=${months}` : '';
+    const response = await apiFetch(`/reports/month-over-month${query}`);
+    return response.json() as Promise<BalancePeriod[]>;
+  },
+
+  /**
+   * GET /api/reports/export
+   * Retorna o arquivo bruto (CSV/PDF) para download.
+   */
+  exportReport: async (format: 'csv' | 'pdf', from?: string, to?: string): Promise<Blob> => {
+    const params = new URLSearchParams({ format });
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    const response = await apiFetch(`/reports/export?${params.toString()}`);
+    return response.blob();
   },
 
   checkAuthStatus,

@@ -117,7 +117,18 @@
   },
   "reportsPage": {
     "title": "Reports",
-    "underConstruction": "Reports page under construction.",
-    "comingSoon": "Soon you'll see detailed charts and analysis here!"
+    "filterHint": "Filter by date range — the charts below use the same range.",
+    "from": "From",
+    "to": "To",
+    "noData": "No data found for the selected period.",
+    "period": "Period",
+    "other": "Other",
+    "balanceTitle": "Balance by period",
+    "categoryBreakdownTitle": "Distribution by category",
+    "monthOverMonthTitle": "Month-over-month comparison",
+    "lastNMonths": "Last {{count}} months",
+    "exportCsv": "Export CSV",
+    "exportPdf": "Export PDF",
+    "exporting": "Exporting..."
   }
 }

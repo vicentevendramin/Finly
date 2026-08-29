@@ -36,3 +36,20 @@ export interface NewContributionData {
   date?: string;
   note?: string;
 }
+
+export interface BalancePeriod {
+  period: string;
+  income: number;
+  expense: number;
+  balance: number;
+}
+
+export interface CategoryTotal {
+  category: string;
+  total: number;
+}
+
+export interface ReportDateRange {
+  from?: string;
+  to?: string;
+}

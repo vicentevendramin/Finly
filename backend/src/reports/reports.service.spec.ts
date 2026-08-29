@@ -86,6 +86,30 @@ describe('ReportsService', () => {
     expect(csv).toContain('"Almoço, com salada"');
   });
 
+  it('normalizes a raw Date object in the date column to YYYY-MM-DD', async () => {
+    // pg returns `date`-typed columns as JS Date objects on raw queries
+    // (unlike the repository layer, which normalizes to plain strings).
+    const qb = buildQueryBuilder({
+      getRawMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          description: 'Salário',
+          amount: '5000.00',
+          date: new Date('2026-08-01T00:00:00.000Z'),
+          type: TransactionType.INCOME,
+          category: 'Trabalho',
+        },
+      ]),
+    });
+    repo.createQueryBuilder.mockReturnValue(qb);
+
+    const result = await service.exportTransactions(10, 'csv');
+
+    const csv = result.buffer.toString('utf-8');
+    expect(csv).toContain('2026-08-01');
+    expect(csv).not.toContain('GMT');
+  });
+
   it('builds a non-empty PDF export', async () => {
     const qb = buildQueryBuilder({
       getRawMany: vi.fn().mockResolvedValue([

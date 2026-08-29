@@ -89,7 +89,7 @@ export class ReportsService {
     from?: string,
     to?: string,
   ): Promise<ExportResult> {
-    const transactions = await this.baseQuery(userId, from, to)
+    const rawTransactions = await this.baseQuery(userId, from, to)
       .select('t.id', 'id')
       .addSelect('t.description', 'description')
       .addSelect('t.amount', 'amount')
@@ -101,10 +101,18 @@ export class ReportsService {
         id: number;
         description: string;
         amount: string;
-        date: string;
+        date: string | Date;
         type: TransactionType;
         category: string;
       }>();
+
+    // pg returns `date`-typed columns as JS Date objects when read via a raw
+    // query (unlike TypeORM's entity/repository layer, which normalizes them
+    // to plain strings) — normalize to YYYY-MM-DD here.
+    const transactions = rawTransactions.map((t) => ({
+      ...t,
+      date: t.date instanceof Date ? t.date.toISOString().split('T')[0] : t.date,
+    }));
 
     if (format === 'csv') {
       const csv = this.buildTransactionsCsv(transactions);

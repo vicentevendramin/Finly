@@ -117,7 +117,18 @@
   },
   "reportsPage": {
     "title": "Relatórios",
-    "underConstruction": "Página de Relatórios em construção.",
-    "comingSoon": "Em breve você verá gráficos e análises detalhadas aqui!"
+    "filterHint": "Filtre por período — os gráficos abaixo usam o mesmo intervalo.",
+    "from": "De",
+    "to": "Até",
+    "noData": "Nenhum dado encontrado para o período selecionado.",
+    "period": "Período",
+    "other": "Outros",
+    "balanceTitle": "Saldo por período",
+    "categoryBreakdownTitle": "Distribuição por categoria",
+    "monthOverMonthTitle": "Comparativo mês a mês",
+    "lastNMonths": "Últimos {{count}} meses",
+    "exportCsv": "Exportar CSV",
+    "exportPdf": "Exportar PDF",
+    "exporting": "Exportando..."
   }
 }
