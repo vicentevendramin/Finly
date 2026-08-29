@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitSchema1787964373807 implements MigrationInterface {
-    name = 'InitSchema1787964373807'
+export class InitSchema1787965037119 implements MigrationInterface {
+    name = 'InitSchema1787965037119'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TYPE "public"."users_role_enum" AS ENUM('user', 'admin')`);
@@ -14,6 +14,7 @@ export class InitSchema1787964373807 implements MigrationInterface {
         await queryRunner.query(`CREATE INDEX "IDX_88b78010581f2d293699d06444" ON "goals" ("user_id") `);
         await queryRunner.query(`CREATE TABLE "goal_contributions" ("id" SERIAL NOT NULL, "amount" numeric(12,2) NOT NULL, "date" date NOT NULL, "note" character varying, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "goal_id" integer NOT NULL, CONSTRAINT "CHK_7b177bed6eac81f5bac2f06f44" CHECK ("amount" > 0), CONSTRAINT "PK_33413874ace4630a4451a4f4bda" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_a3486f892fb14eceb63fd37d49" ON "goal_contributions" ("goal_id") `);
+        await queryRunner.query(`CREATE TABLE "error_logs" ("id" SERIAL NOT NULL, "message" character varying NOT NULL, "stack" text, "path" character varying NOT NULL, "user_id" integer, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_6840885d7eb78406fa7d358be72" PRIMARY KEY ("id"))`);
         await queryRunner.query(`ALTER TABLE "transactions" ADD CONSTRAINT "FK_e9acc6efa76de013e8c1553ed2b" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "goals" ADD CONSTRAINT "FK_88b78010581f2d293699d064441" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "goal_contributions" ADD CONSTRAINT "FK_a3486f892fb14eceb63fd37d492" FOREIGN KEY ("goal_id") REFERENCES "goals"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
@@ -23,6 +24,7 @@ export class InitSchema1787964373807 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "goal_contributions" DROP CONSTRAINT "FK_a3486f892fb14eceb63fd37d492"`);
         await queryRunner.query(`ALTER TABLE "goals" DROP CONSTRAINT "FK_88b78010581f2d293699d064441"`);
         await queryRunner.query(`ALTER TABLE "transactions" DROP CONSTRAINT "FK_e9acc6efa76de013e8c1553ed2b"`);
+        await queryRunner.query(`DROP TABLE "error_logs"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_a3486f892fb14eceb63fd37d49"`);
         await queryRunner.query(`DROP TABLE "goal_contributions"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_88b78010581f2d293699d06444"`);
