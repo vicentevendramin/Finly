@@ -40,7 +40,7 @@ describe('AuthService', () => {
 
       const result = await authService.register({
         email: 'test@example.com',
-        password: 'senha123',
+        password: 'password123',
       });
 
       expect(usersService.create).toHaveBeenCalledWith(
@@ -57,7 +57,7 @@ describe('AuthService', () => {
       usersService.findByEmail.mockResolvedValue(buildUser());
 
       await expect(
-        authService.register({ email: 'test@example.com', password: 'senha123' }),
+        authService.register({ email: 'test@example.com', password: 'password123' }),
       ).rejects.toThrow(ConflictException);
       expect(usersService.create).not.toHaveBeenCalled();
     });
@@ -65,12 +65,12 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('returns a token when credentials are valid', async () => {
-      const passwordHash = await bcrypt.hash('senha123', 4);
+      const passwordHash = await bcrypt.hash('password123', 4);
       usersService.findByEmail.mockResolvedValue(buildUser({ passwordHash }));
 
       const result = await authService.login({
         email: 'test@example.com',
-        password: 'senha123',
+        password: 'password123',
       });
 
       expect(result.user).toEqual({ id: '1', email: 'test@example.com', role: UserRole.USER });
@@ -80,7 +80,7 @@ describe('AuthService', () => {
       usersService.findByEmail.mockResolvedValue(null);
 
       await expect(
-        authService.login({ email: 'nope@example.com', password: 'senha123' }),
+        authService.login({ email: 'nope@example.com', password: 'password123' }),
       ).rejects.toThrow(UnauthorizedException);
     });
 

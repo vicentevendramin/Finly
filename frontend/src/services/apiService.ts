@@ -11,14 +11,14 @@ import type {
   AdminErrorLog,
 } from '../types';
 
-// ─── Configuração base ────────────────────────────────────────────────────────
+// ─── Base configuration ──────────────────────────────────────────────────────
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 /**
- * Wrapper sobre fetch que:
- * - Injeta o Authorization header automaticamente
- * - Lança um erro legível quando a resposta não for 2xx
+ * Wrapper around fetch that:
+ * - Injects the Authorization header automatically
+ * - Throws a readable error when the response is not 2xx
  */
 const apiFetch = async (path: string, options: RequestInit = {}): Promise<Response> => {
   const token = localStorage.getItem('token');
@@ -37,23 +37,23 @@ const apiFetch = async (path: string, options: RequestInit = {}): Promise<Respon
     headers,
   });
 
-  // Se a resposta não for 2xx, extrai a mensagem de erro do backend e lança
+  // If the response is not 2xx, extract the backend's error message and throw
   if (!response.ok) {
-    // DELETE retorna 204 sem corpo — tratado antes de tentar parsear
+    // DELETE returns 204 with no body — handled before trying to parse
     if (response.status === 204) return response;
 
-    const errorBody = await response.json().catch(() => ({ error: 'Erro desconhecido.' }));
-    throw new Error(errorBody.error || `Erro HTTP ${response.status}`);
+    const errorBody = await response.json().catch(() => ({ error: 'Unknown error.' }));
+    throw new Error(errorBody.error || `HTTP error ${response.status}`);
   }
 
   return response;
 };
 
-// ─── Serviços de autenticação ─────────────────────────────────────────────────
+// ─── Authentication services ─────────────────────────────────────────────────
 
 /**
- * Verifica se há um token válido no localStorage e o valida com o backend.
- * Substitui o checkAuthStatus do mock.
+ * Checks whether there's a valid token in localStorage and validates it with the backend.
+ * Replaces the mock's checkAuthStatus.
  */
 const checkAuthStatus = async (): Promise<User | null> => {
   const token = localStorage.getItem('token');
@@ -64,14 +64,14 @@ const checkAuthStatus = async (): Promise<User | null> => {
     const data = await response.json();
     return data.user as User;
   } catch {
-    // Token expirado ou inválido — limpa o localStorage
+    // Expired or invalid token — clear localStorage
     localStorage.removeItem('token');
     return null;
   }
 };
 
 /**
- * Remove o token do localStorage (o backend não precisa ser notificado).
+ * Removes the token from localStorage (the backend doesn't need to be notified).
  */
 const logout = async (): Promise<void> => {
   localStorage.removeItem('token');
@@ -91,7 +91,7 @@ export const apiService = {
 
     const data = await response.json();
 
-    // Salva o token para as próximas requisições
+    // Store the token for subsequent requests
     localStorage.setItem('token', data.token);
 
     return data.user as User;
@@ -108,7 +108,7 @@ export const apiService = {
 
     const data = await response.json();
 
-    // Loga o usuário automaticamente após o registro
+    // Log the user in automatically after registration
     localStorage.setItem('token', data.token);
 
     return data.user as User;
@@ -116,7 +116,7 @@ export const apiService = {
 
   /**
    * GET /api/transactions
-   * Opcionalmente filtra por mês: getTransactions('2025-11')
+   * Optionally filters by month: getTransactions('2025-11')
    */
   getTransactions: async (month?: string): Promise<Transaction[]> => {
     const query = month ? `?month=${month}` : '';
@@ -239,7 +239,7 @@ export const apiService = {
 
   /**
    * GET /api/reports/export
-   * Retorna o arquivo bruto (CSV/PDF) para download.
+   * Returns the raw file (CSV/PDF) for download.
    */
   exportReport: async (format: 'csv' | 'pdf', from?: string, to?: string): Promise<Blob> => {
     const params = new URLSearchParams({ format });

@@ -22,34 +22,34 @@ const DashboardPage: React.FC = () => {
   const summary = transactions.reduce(
     (acc, tx) => {
       if (tx.type === 'income') {
-        acc.totalReceitas += tx.amount;
+        acc.totalIncome += tx.amount;
       } else if (tx.type === 'expense') {
-        acc.totalDespesas += tx.amount;
+        acc.totalExpenses += tx.amount;
       }
-      acc.saldoMes = acc.totalReceitas - acc.totalDespesas;
+      acc.monthBalance = acc.totalIncome - acc.totalExpenses;
       return acc;
     },
-    { totalReceitas: 0, totalDespesas: 0, saldoMes: 0 },
+    { totalIncome: 0, totalExpenses: 0, monthBalance: 0 },
   );
-  const isNegativeBalance = !isLoading && summary.saldoMes < 0;
+  const isNegativeBalance = !isLoading && summary.monthBalance < 0;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* Coluna Principal (esquerda) */}
+      {/* Main column (left) */}
       <div className="lg:col-span-2 space-y-8">
-        {/* Cards de Resumo */}
+        {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border-t-4 border-success-500">
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">{t('dashboard.income')}</h3>
             <p className="text-3xl font-bold text-gray-900 dark:text-gray-50 mt-2">
-              {isLoading ? '...' : `R$ ${summary.totalReceitas.toFixed(2)}`}
+              {isLoading ? '...' : `R$ ${summary.totalIncome.toFixed(2)}`}
             </p>
           </div>
 
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border-t-4 border-danger-500">
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">{t('dashboard.expenses')}</h3>
             <p className="text-3xl font-bold text-gray-900 dark:text-gray-50 mt-2">
-              {isLoading ? '...' : `R$ ${summary.totalDespesas.toFixed(2)}`}
+              {isLoading ? '...' : `R$ ${summary.totalExpenses.toFixed(2)}`}
             </p>
           </div>
 
@@ -64,12 +64,12 @@ const DashboardPage: React.FC = () => {
                 isNegativeBalance ? 'text-accent-600 dark:text-accent-400' : 'text-gray-900 dark:text-gray-50'
               }`}
             >
-              {isLoading ? '...' : `R$ ${summary.saldoMes.toFixed(2)}`}
+              {isLoading ? '...' : `R$ ${summary.monthBalance.toFixed(2)}`}
             </p>
           </div>
         </div>
 
-        {/* Lançamentos Recentes */}
+        {/* Recent transactions */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl">
           <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
             {t('dashboard.recentTransactions')}
@@ -114,7 +114,7 @@ const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Coluna Lateral (direita) */}
+      {/* Side column (right) */}
       <div className="lg:col-span-1 space-y-8">
         <CategoryChart />
         <GoalsList />

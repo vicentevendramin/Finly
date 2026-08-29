@@ -13,7 +13,7 @@ interface ModalProps {
 
 const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transactionToEdit }) => {
   const { t } = useTranslation();
-  // Estado do formulário
+  // Form state
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState<number | ''>('');
   const [type, setType] = useState<'income' | 'expense'>('expense');
@@ -21,17 +21,17 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Efeito para preencher o formulário quando 'transactionToEdit' mudar
+  // Effect to fill the form when 'transactionToEdit' changes
   useEffect(() => {
     if (isOpen) {
       if (transactionToEdit) {
-        // Modo Edição: preenche o formulário
+        // Edit mode: fill the form
         setDescription(transactionToEdit.description);
-        setAmount(Math.abs(transactionToEdit.amount)); // Usamos sempre valor positivo no input
+        setAmount(Math.abs(transactionToEdit.amount)); // Always use a positive value in the input
         setType(transactionToEdit.type);
         setCategory(transactionToEdit.category);
       } else {
-        // Limpa o formulário
+        // Clear the form
         setDescription('');
         setAmount('');
         setType('expense');
@@ -40,7 +40,7 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
       setError('');
       setIsLoading(false);
     }
-  }, [isOpen, transactionToEdit]); // Roda sempre que o modal abre ou a transação muda
+  }, [isOpen, transactionToEdit]); // Runs whenever the modal opens or the transaction changes
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,22 +53,22 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
 
     const data: NewTransactionData = {
       description,
-      amount: Math.abs(amount), // API sempre recebe valor positivo
+      amount: Math.abs(amount), // API always receives a positive value
       type,
       category,
     };
-    
-    // O onSave (do App.tsx) agora sabe se está editando ou salvando
+
+    // onSave (from App.tsx) now knows whether it's editing or saving
     await onSave(data);
-    
-    // O App.tsx agora é responsável por fechar o modal
-    // (onSave já chama handleCloseModal)
+
+    // App.tsx is now responsible for closing the modal
+    // (onSave already calls handleCloseModal)
     setIsLoading(false);
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // Permite apenas números e um ponto decimal
+    // Allow only digits and a single decimal point
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       setAmount(val === '' ? '' : Number(val));
     }
@@ -81,11 +81,11 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
   return (
     // Backdrop
     <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
-      {/* Conteúdo do Modal */}
+      {/* Modal content */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg z-50">
-        {/* Header do Modal */}
+        {/* Modal header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
-          {/* ítulo dinâmico */}
+          {/* Dynamic title */}
           <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
             {transactionToEdit ? t('transactionModal.editTitle') : t('transactionModal.newTitle')}
           </h3>
@@ -98,10 +98,10 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
           </button>
         </div>
 
-        {/* Formulário */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
-            {/* Tipo (Receita/Despesa) */}
+            {/* Type (Income/Expense) */}
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
@@ -127,13 +127,13 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
               </button>
             </div>
 
-            {/* Valor */}
+            {/* Amount */}
             <div>
               <label htmlFor="amount" className={`${labelClass} mb-1`}>
                 {t('transactionModal.amountLabel')}
               </label>
               <input
-                type="text" // Usamos 'text' para controlar o formato
+                type="text" // Use 'text' to control the format
                 id="amount"
                 value={amount}
                 onChange={handleAmountChange}
@@ -142,7 +142,7 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
               />
             </div>
 
-            {/* Descrição */}
+            {/* Description */}
             <div>
               <label htmlFor="description" className={`${labelClass} mb-1`}>
                 {t('transactionModal.descriptionLabel')}
@@ -157,7 +157,7 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
               />
             </div>
 
-            {/* Categoria */}
+            {/* Category */}
             <div>
               <label htmlFor="category" className={`${labelClass} mb-1`}>
                 {t('transactionModal.categoryLabel')}
@@ -170,13 +170,13 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
                 placeholder={t('transactionModal.categoryPlaceholder')}
                 className={textInputClass}
               />
-              {/* TODO: Substituir por um <select> com categorias pré-definidas */}
+              {/* TODO: Replace with a <select> of predefined categories */}
             </div>
 
             {error && <p className="text-danger-500 text-sm">{error}</p>}
           </div>
 
-          {/* Botão Salvar */}
+          {/* Save button */}
           <div className="mt-8">
             <button type="submit" disabled={isLoading} className={primaryButtonClass}>
               {isLoading

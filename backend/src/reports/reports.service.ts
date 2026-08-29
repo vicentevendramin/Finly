@@ -118,13 +118,13 @@ export class ReportsService {
       const csv = this.buildTransactionsCsv(transactions);
       return {
         buffer: Buffer.from(csv, 'utf-8'),
-        filename: 'transacoes.csv',
+        filename: 'transactions.csv',
         contentType: 'text/csv',
       };
     }
 
     const buffer = await this.buildTransactionsPdf(transactions);
-    return { buffer, filename: 'transacoes.pdf', contentType: 'application/pdf' };
+    return { buffer, filename: 'transactions.pdf', contentType: 'application/pdf' };
   }
 
   private buildTransactionsCsv(
@@ -170,7 +170,7 @@ export class ReportsService {
       doc.on('end', () => resolve(Buffer.concat(chunks)));
       doc.on('error', reject);
 
-      doc.fontSize(16).text('Finly — Extrato de transações', { align: 'center' });
+      doc.fontSize(16).text('Finly — Transaction statement', { align: 'center' });
       doc.moveDown();
 
       transactions.forEach((t) => {

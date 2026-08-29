@@ -2,7 +2,7 @@ export interface User {
   id: string;
   email: string;
   role: 'user' | 'admin';
-  name?: string; // Deixamos 'name' como opcional, mas a API não o envia
+  name?: string; // 'name' is kept optional, but the API doesn't send it
 }
 
 export interface Transaction {

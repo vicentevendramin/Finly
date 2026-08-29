@@ -8,11 +8,11 @@ const buildTransaction = (overrides: Partial<Transaction> = {}): Transaction =>
   ({
     id: 1,
     user: { id: 10 } as Transaction['user'],
-    description: 'Salário',
+    description: 'Salary',
     amount: '5000.00',
     date: '2026-08-01',
     type: TransactionType.INCOME,
-    category: 'Trabalho',
+    category: 'Work',
     createdAt: new Date(),
     ...overrides,
   }) as Transaction;
@@ -54,11 +54,11 @@ describe('TransactionsService', () => {
       expect(result).toEqual([
         {
           id: '1',
-          description: 'Salário',
+          description: 'Salary',
           amount: 5000,
           date: '2026-08-01',
           type: 'income',
-          category: 'Trabalho',
+          category: 'Work',
         },
       ]);
       expect(qb.andWhere).not.toHaveBeenCalled();

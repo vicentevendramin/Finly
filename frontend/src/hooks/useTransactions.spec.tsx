@@ -21,11 +21,11 @@ vi.mock('../services/apiService', () => ({
 
 const mockTransaction: Transaction = {
   id: '1',
-  description: 'Salário',
+  description: 'Salary',
   amount: 5000,
   date: '2026-08-01',
   type: 'income',
-  category: 'Trabalho',
+  category: 'Work',
 };
 
 describe('useTransactions', () => {
@@ -51,7 +51,7 @@ describe('useTransactions', () => {
 
     const { result } = renderHook(() => useCreateTransaction(), { wrapper: Wrapper });
 
-    result.current.mutate({ description: 'Salário', amount: 5000, type: 'income', category: 'Trabalho' });
+    result.current.mutate({ description: 'Salary', amount: 5000, type: 'income', category: 'Work' });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['transactions'] });
@@ -66,7 +66,7 @@ describe('useTransactions', () => {
     const { result } = renderHook(() => useUpdateTransaction(), { wrapper: Wrapper });
     result.current.mutate({
       id: '1',
-      data: { description: 'Salário', amount: 5500, type: 'income', category: 'Trabalho' },
+      data: { description: 'Salary', amount: 5500, type: 'income', category: 'Work' },
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

@@ -11,7 +11,7 @@ export class HealthController {
     try {
       await this.dataSource.query('SELECT 1');
     } catch {
-      throw new ServiceUnavailableException('Banco de dados indisponível.');
+      throw new ServiceUnavailableException('Database unavailable.');
     }
     return { status: 'ok', timestamp: new Date().toISOString() };
   }

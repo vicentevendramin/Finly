@@ -2,11 +2,11 @@ import { Type } from 'class-transformer';
 import { IsDateString, IsNotEmpty, IsOptional, IsPositive, IsString } from 'class-validator';
 
 export class CreateGoalDto {
-  @IsNotEmpty({ message: 'O nome da meta é obrigatório.' })
+  @IsNotEmpty({ message: 'The goal name is required.' })
   name: string;
 
   @Type(() => Number)
-  @IsPositive({ message: 'targetAmount deve ser um número positivo.' })
+  @IsPositive({ message: 'targetAmount must be a positive number.' })
   targetAmount: number;
 
   @IsOptional()

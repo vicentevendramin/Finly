@@ -73,14 +73,14 @@ const Sidebar: React.FC = () => {
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        {/* Logo / Título */}
+        {/* Logo / Title */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h1 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
             Finly
           </h1>
         </div>
 
-        {/* Botão Nova Transação */}
+        {/* New Transaction button */}
         <div className="p-6">
           <button
             onClick={handleNewTransaction}
@@ -91,7 +91,7 @@ const Sidebar: React.FC = () => {
           </button>
         </div>
 
-        {/* Navegação Principal */}
+        {/* Main navigation */}
         <nav className="flex-1 px-6 space-y-2">
           <SidebarNavItem to="/app/dashboard" icon={Home} label={t('sidebar.dashboard')} onNavigate={closeMobileMenu} />
           <SidebarNavItem to="/app/transactions" icon={List} label={t('sidebar.transactions')} onNavigate={closeMobileMenu} />
@@ -102,7 +102,7 @@ const Sidebar: React.FC = () => {
           )}
         </nav>
 
-        {/* Perfil / Logout */}
+        {/* Profile / Logout */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 mt-auto space-y-4">
           <div className="flex items-center justify-center gap-3">
             <LanguageSwitcher />

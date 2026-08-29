@@ -9,20 +9,20 @@ import {
 import { TransactionType } from '../entities/transaction.entity.js';
 
 export class CreateTransactionDto {
-  @IsNotEmpty({ message: 'Campos obrigatórios: description, amount, type, category.' })
+  @IsNotEmpty({ message: 'Required fields: description, amount, type, category.' })
   description: string;
 
   @Type(() => Number)
-  @IsPositive({ message: 'amount deve ser um número positivo.' })
+  @IsPositive({ message: 'amount must be a positive number.' })
   amount: number;
 
   @IsOptional()
   @IsDateString()
   date?: string;
 
-  @IsEnum(TransactionType, { message: 'type deve ser "income" ou "expense".' })
+  @IsEnum(TransactionType, { message: 'type must be "income" or "expense".' })
   type: TransactionType;
 
-  @IsNotEmpty({ message: 'Campos obrigatórios: description, amount, type, category.' })
+  @IsNotEmpty({ message: 'Required fields: description, amount, type, category.' })
   category: string;
 }

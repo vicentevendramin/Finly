@@ -14,10 +14,10 @@ vi.mock('../services/apiService', () => ({
 
 const goal: Goal = {
   id: '1',
-  name: 'Viagem dos sonhos',
+  name: 'Dream trip',
   targetAmount: 2000,
   currentAmount: 450,
-  category: 'Viagem',
+  category: 'Travel',
   deadline: null,
 };
 
@@ -32,7 +32,7 @@ describe('GoalCard', () => {
 
     expect(screen.getByText('23%')).toBeInTheDocument();
     expect(screen.getByText('R$ 450.00 / R$ 2000.00')).toBeInTheDocument();
-    expect(screen.getByText('Viagem')).toBeInTheDocument();
+    expect(screen.getByText('Travel')).toBeInTheDocument();
   });
 
   it('caps progress at 100% when contributions exceed the target', () => {

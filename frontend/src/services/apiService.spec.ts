@@ -47,7 +47,7 @@ describe('apiService', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    await apiService.login('a@b.com', 'senha123');
+    await apiService.login('a@b.com', 'password123');
 
     expect(localStorage.getItem('token')).toBe('new-token');
   });
@@ -56,12 +56,12 @@ describe('apiService', () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
       status: 401,
-      json: vi.fn().mockResolvedValue({ error: 'Usuário ou senha inválidos.' }),
+      json: vi.fn().mockResolvedValue({ error: 'Invalid username or password.' }),
     } as unknown as Response);
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(apiService.login('a@b.com', 'wrong')).rejects.toThrow(
-      'Usuário ou senha inválidos.',
+      'Invalid username or password.',
     );
   });
 
@@ -78,7 +78,7 @@ describe('apiService', () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
       status: 401,
-      json: vi.fn().mockResolvedValue({ error: 'Sessão expirada.' }),
+      json: vi.fn().mockResolvedValue({ error: 'Session expired.' }),
     } as unknown as Response);
     vi.stubGlobal('fetch', fetchMock);
 

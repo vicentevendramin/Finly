@@ -10,7 +10,7 @@ import { User, UserRole } from '../src/users/entities/user.entity.js';
 async function registerAndLogin(app: INestApplication, email: string) {
   const res = await request(app.getHttpServer())
     .post('/api/auth/register')
-    .send({ email, password: 'senha123' })
+    .send({ email, password: 'password123' })
     .expect(201);
   return res.body.token as string;
 }
@@ -38,7 +38,7 @@ describe('Admin (e2e)', () => {
     // to get a token whose payload reflects the promotion.
     const login = await request(app.getHttpServer())
       .post('/api/auth/login')
-      .send({ email: adminEmail, password: 'senha123' })
+      .send({ email: adminEmail, password: 'password123' })
       .expect(200);
     adminToken = login.body.token;
   });

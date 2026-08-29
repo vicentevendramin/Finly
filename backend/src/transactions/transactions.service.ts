@@ -61,7 +61,7 @@ export class TransactionsService {
       where: { id, user: { id: userId } },
     });
     if (!existing) {
-      throw new NotFoundException('Transação não encontrada.');
+      throw new NotFoundException('Transaction not found.');
     }
 
     existing.description = dto.description.trim();
@@ -80,7 +80,7 @@ export class TransactionsService {
       user: { id: userId },
     });
     if (!result.affected) {
-      throw new NotFoundException('Transação não encontrada.');
+      throw new NotFoundException('Transaction not found.');
     }
   }
 

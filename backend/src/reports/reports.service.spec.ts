@@ -46,8 +46,8 @@ describe('ReportsService', () => {
   it('maps category breakdown rows to numbers', async () => {
     const qb = buildQueryBuilder({
       getRawMany: vi.fn().mockResolvedValue([
-        { category: 'Alimentação', total: '250.75' },
-        { category: 'Transporte', total: '120.00' },
+        { category: 'Food', total: '250.75' },
+        { category: 'Transport', total: '120.00' },
       ]),
     });
     repo.createQueryBuilder.mockReturnValue(qb);
@@ -55,8 +55,8 @@ describe('ReportsService', () => {
     const result = await service.getCategoryBreakdown(10, TransactionType.EXPENSE);
 
     expect(result).toEqual([
-      { category: 'Alimentação', total: 250.75 },
-      { category: 'Transporte', total: 120 },
+      { category: 'Food', total: 250.75 },
+      { category: 'Transport', total: 120 },
     ]);
     expect(qb.andWhere).toHaveBeenCalledWith('t.type = :type', {
       type: TransactionType.EXPENSE,
@@ -68,11 +68,11 @@ describe('ReportsService', () => {
       getRawMany: vi.fn().mockResolvedValue([
         {
           id: 1,
-          description: 'Almoço, com salada',
+          description: 'Lunch, with salad',
           amount: '35.00',
           date: '2026-08-01',
           type: TransactionType.EXPENSE,
-          category: 'Alimentação',
+          category: 'Food',
         },
       ]),
     });
@@ -83,7 +83,7 @@ describe('ReportsService', () => {
     expect(result.contentType).toBe('text/csv');
     const csv = result.buffer.toString('utf-8');
     expect(csv).toContain('id,description,amount,date,type,category');
-    expect(csv).toContain('"Almoço, com salada"');
+    expect(csv).toContain('"Lunch, with salad"');
   });
 
   it('normalizes a raw Date object in the date column to YYYY-MM-DD', async () => {
@@ -93,11 +93,11 @@ describe('ReportsService', () => {
       getRawMany: vi.fn().mockResolvedValue([
         {
           id: 1,
-          description: 'Salário',
+          description: 'Salary',
           amount: '5000.00',
           date: new Date('2026-08-01T00:00:00.000Z'),
           type: TransactionType.INCOME,
-          category: 'Trabalho',
+          category: 'Work',
         },
       ]),
     });
@@ -115,11 +115,11 @@ describe('ReportsService', () => {
       getRawMany: vi.fn().mockResolvedValue([
         {
           id: 1,
-          description: 'Salário',
+          description: 'Salary',
           amount: '5000.00',
           date: '2026-08-01',
           type: TransactionType.INCOME,
-          category: 'Trabalho',
+          category: 'Work',
         },
       ]),
     });

@@ -16,10 +16,10 @@ vi.mock('../services/apiService', () => ({
 
 const mockGoal: Goal = {
   id: '1',
-  name: 'Viagem dos sonhos',
+  name: 'Dream trip',
   targetAmount: 2000,
   currentAmount: 450,
-  category: 'Viagem',
+  category: 'Travel',
   deadline: null,
 };
 
@@ -44,7 +44,7 @@ describe('useGoals', () => {
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     const { result } = renderHook(() => useCreateGoal(), { wrapper: Wrapper });
-    result.current.mutate({ name: 'Viagem dos sonhos', targetAmount: 2000 });
+    result.current.mutate({ name: 'Dream trip', targetAmount: 2000 });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['goals'] });

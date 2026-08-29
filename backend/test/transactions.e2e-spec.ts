@@ -7,7 +7,7 @@ import { bootstrapTestApp } from './utils/bootstrap-app.js';
 async function registerAndLogin(app: INestApplication, email: string) {
   const res = await request(app.getHttpServer())
     .post('/api/auth/register')
-    .send({ email, password: 'senha123' })
+    .send({ email, password: 'password123' })
     .expect(201);
   return res.body.token as string;
 }
@@ -44,19 +44,19 @@ describe('Transactions (e2e)', () => {
       .post('/api/transactions')
       .set('Authorization', `Bearer ${tokenA}`)
       .send({
-        description: 'Salário',
+        description: 'Salary',
         amount: 5000,
         type: 'income',
-        category: 'Trabalho',
+        category: 'Work',
         date: '2026-08-01',
       })
       .expect(201);
 
     expect(create.body).toMatchObject({
-      description: 'Salário',
+      description: 'Salary',
       amount: 5000,
       type: 'income',
-      category: 'Trabalho',
+      category: 'Work',
       date: '2026-08-01',
     });
     const id = create.body.id as string;
@@ -71,15 +71,15 @@ describe('Transactions (e2e)', () => {
       .put(`/api/transactions/${id}`)
       .set('Authorization', `Bearer ${tokenA}`)
       .send({
-        description: 'Salário ajustado',
+        description: 'Adjusted salary',
         amount: 5500,
         type: 'income',
-        category: 'Trabalho',
+        category: 'Work',
         date: '2026-08-01',
       })
       .expect(200)
       .expect(({ body }) => {
-        expect(body.description).toBe('Salário ajustado');
+        expect(body.description).toBe('Adjusted salary');
         expect(body.amount).toBe(5500);
       });
 
@@ -99,10 +99,10 @@ describe('Transactions (e2e)', () => {
       .post('/api/transactions')
       .set('Authorization', `Bearer ${tokenA}`)
       .send({
-        description: 'Privado do usuário A',
+        description: "User A's private",
         amount: 100,
         type: 'expense',
-        category: 'Pessoal',
+        category: 'Personal',
       })
       .expect(201);
     const id = create.body.id as string;
@@ -117,10 +117,10 @@ describe('Transactions (e2e)', () => {
       .put(`/api/transactions/${id}`)
       .set('Authorization', `Bearer ${tokenB}`)
       .send({
-        description: 'Tentativa de alterar',
+        description: 'Attempt to change',
         amount: 1,
         type: 'expense',
-        category: 'Pessoal',
+        category: 'Personal',
       })
       .expect(404);
 

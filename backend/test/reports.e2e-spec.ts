@@ -7,7 +7,7 @@ import { bootstrapTestApp } from './utils/bootstrap-app.js';
 async function registerAndLogin(app: INestApplication, email: string) {
   const res = await request(app.getHttpServer())
     .post('/api/auth/register')
-    .send({ email, password: 'senha123' })
+    .send({ email, password: 'password123' })
     .expect(201);
   return res.body.token as string;
 }
@@ -28,31 +28,31 @@ describe('Reports (e2e)', () => {
         .expect(201);
 
     await tx({
-      description: 'Salário',
+      description: 'Salary',
       amount: 5000,
       type: 'income',
-      category: 'Trabalho',
+      category: 'Work',
       date: '2026-07-05',
     });
     await tx({
-      description: 'Aluguel',
+      description: 'Rent',
       amount: 1500,
       type: 'expense',
-      category: 'Moradia',
+      category: 'Housing',
       date: '2026-07-10',
     });
     await tx({
-      description: 'Mercado',
+      description: 'Groceries',
       amount: 400,
       type: 'expense',
-      category: 'Alimentação',
+      category: 'Food',
       date: '2026-07-15',
     });
     await tx({
-      description: 'Freela',
+      description: 'Freelance',
       amount: 800,
       type: 'income',
-      category: 'Trabalho',
+      category: 'Work',
       date: '2026-08-01',
     });
   });
@@ -87,8 +87,8 @@ describe('Reports (e2e)', () => {
 
     expect(res.body).toEqual(
       expect.arrayContaining([
-        { category: 'Moradia', total: 1500 },
-        { category: 'Alimentação', total: 400 },
+        { category: 'Housing', total: 1500 },
+        { category: 'Food', total: 400 },
       ]),
     );
   });
@@ -102,7 +102,7 @@ describe('Reports (e2e)', () => {
 
     expect(res.headers['content-type']).toContain('text/csv');
     expect(res.text).toContain('id,description,amount,date,type,category');
-    expect(res.text).toContain('Salário');
+    expect(res.text).toContain('Salary');
   });
 
   it('exports transactions as PDF', async () => {

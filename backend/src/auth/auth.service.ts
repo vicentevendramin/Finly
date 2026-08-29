@@ -32,7 +32,7 @@ export class AuthService {
   async register(dto: RegisterDto): Promise<AuthResult> {
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) {
-      throw new ConflictException('Este email já está cadastrado.');
+      throw new ConflictException('This email is already registered.');
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
@@ -44,12 +44,12 @@ export class AuthService {
   async login(dto: LoginDto): Promise<AuthResult> {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) {
-      throw new UnauthorizedException('Usuário ou senha inválidos.');
+      throw new UnauthorizedException('Invalid username or password.');
     }
 
     const passwordMatch = await bcrypt.compare(dto.password, user.passwordHash);
     if (!passwordMatch) {
-      throw new UnauthorizedException('Usuário ou senha inválidos.');
+      throw new UnauthorizedException('Invalid username or password.');
     }
 
     return this.buildAuthResult(user);
@@ -58,7 +58,7 @@ export class AuthService {
   async me(userId: number): Promise<{ user: AuthUser }> {
     const user = await this.usersService.findById(userId);
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado.');
+      throw new NotFoundException('User not found.');
     }
     return { user: this.toAuthUser(user) };
   }

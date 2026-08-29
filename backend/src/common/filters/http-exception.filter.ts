@@ -41,7 +41,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const message = isHttpException
       ? this.extractMessage(exception)
-      : 'Erro interno do servidor.';
+      : 'Internal server error.';
 
     if (!isHttpException || status >= 500) {
       this.logger.error(exception instanceof Error ? exception.stack : exception);
@@ -61,7 +61,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       });
       await this.errorLogRepository.save(errorLog);
     } catch (persistError) {
-      this.logger.error('Falha ao persistir ErrorLog', persistError as Error);
+      this.logger.error('Failed to persist ErrorLog', persistError as Error);
     }
   }
 

@@ -34,10 +34,10 @@ describe('HttpExceptionFilter', () => {
   it('normalizes an HttpException to the {error} shape without persisting it', async () => {
     const { host, status, json } = buildHost();
 
-    await filter.catch(new BadRequestException('email inválido'), host);
+    await filter.catch(new BadRequestException('invalid email'), host);
 
     expect(status).toHaveBeenCalledWith(400);
-    expect(json).toHaveBeenCalledWith({ error: 'email inválido' });
+    expect(json).toHaveBeenCalledWith({ error: 'invalid email' });
     expect(errorLogRepo.save).not.toHaveBeenCalled();
   });
 
@@ -47,7 +47,7 @@ describe('HttpExceptionFilter', () => {
     await filter.catch(new Error('db connection lost'), host);
 
     expect(status).toHaveBeenCalledWith(500);
-    expect(json).toHaveBeenCalledWith({ error: 'Erro interno do servidor.' });
+    expect(json).toHaveBeenCalledWith({ error: 'Internal server error.' });
     expect(errorLogRepo.save).toHaveBeenCalledWith(
       expect.objectContaining({
         message: 'db connection lost',
@@ -63,6 +63,6 @@ describe('HttpExceptionFilter', () => {
 
     await expect(filter.catch(new Error('boom'), host)).resolves.toBeUndefined();
     expect(status).toHaveBeenCalledWith(500);
-    expect(json).toHaveBeenCalledWith({ error: 'Erro interno do servidor.' });
+    expect(json).toHaveBeenCalledWith({ error: 'Internal server error.' });
   });
 });

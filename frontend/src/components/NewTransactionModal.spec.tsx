@@ -6,11 +6,11 @@ import type { Transaction } from '../types';
 
 const existingTransaction: Transaction = {
   id: '1',
-  description: 'Aluguel',
+  description: 'Rent',
   amount: 1500,
   date: '2026-08-01',
   type: 'expense',
-  category: 'Moradia',
+  category: 'Housing',
 };
 
 describe('NewTransactionModal', () => {
@@ -38,16 +38,16 @@ describe('NewTransactionModal', () => {
     render(<NewTransactionModal isOpen onClose={vi.fn()} onSave={onSave} transactionToEdit={null} />);
 
     await user.type(screen.getByLabelText(/valor/i), '250');
-    await user.type(screen.getByLabelText(/descrição/i), 'Mercado');
-    await user.type(screen.getByLabelText(/categoria/i), 'Alimentação');
+    await user.type(screen.getByLabelText(/descrição/i), 'Groceries');
+    await user.type(screen.getByLabelText(/categoria/i), 'Food');
     await user.click(screen.getByRole('button', { name: /salvar transação/i }));
 
     await waitFor(() =>
       expect(onSave).toHaveBeenCalledWith({
-        description: 'Mercado',
+        description: 'Groceries',
         amount: 250,
         type: 'expense',
-        category: 'Alimentação',
+        category: 'Food',
       }),
     );
   });
@@ -62,9 +62,9 @@ describe('NewTransactionModal', () => {
       />,
     );
 
-    expect(screen.getByDisplayValue('Aluguel')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Rent')).toBeInTheDocument();
     expect(screen.getByDisplayValue('1500')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Moradia')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Housing')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Editar Transação' })).toBeInTheDocument();
   });
 

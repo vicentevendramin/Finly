@@ -7,7 +7,7 @@ import { bootstrapTestApp } from './utils/bootstrap-app.js';
 describe('Auth (e2e)', () => {
   let app: INestApplication;
   const email = `e2e-auth-${randomUUID()}@example.com`;
-  const password = 'senha123';
+  const password = 'password123';
 
   beforeAll(async () => {
     app = await bootstrapTestApp();

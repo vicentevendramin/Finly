@@ -8,7 +8,7 @@ export class UpdateGoalDto {
 
   @IsOptional()
   @Type(() => Number)
-  @IsPositive({ message: 'targetAmount deve ser um número positivo.' })
+  @IsPositive({ message: 'targetAmount must be a positive number.' })
   targetAmount?: number;
 
   @IsOptional()

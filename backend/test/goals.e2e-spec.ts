@@ -7,7 +7,7 @@ import { bootstrapTestApp } from './utils/bootstrap-app.js';
 async function registerAndLogin(app: INestApplication, email: string) {
   const res = await request(app.getHttpServer())
     .post('/api/auth/register')
-    .send({ email, password: 'senha123' })
+    .send({ email, password: 'password123' })
     .expect(201);
   return res.body.token as string;
 }
@@ -33,11 +33,11 @@ describe('Goals (e2e)', () => {
     const create = await request(app.getHttpServer())
       .post('/api/goals')
       .set('Authorization', `Bearer ${token}`)
-      .send({ name: 'Reserva de emergência', targetAmount: 1000 })
+      .send({ name: 'Emergency fund', targetAmount: 1000 })
       .expect(201);
 
     expect(create.body).toMatchObject({
-      name: 'Reserva de emergência',
+      name: 'Emergency fund',
       targetAmount: 1000,
       currentAmount: 0,
       category: null,
@@ -67,7 +67,7 @@ describe('Goals (e2e)', () => {
     const create = await request(app.getHttpServer())
       .post('/api/goals')
       .set('Authorization', `Bearer ${token}`)
-      .send({ name: 'Viagem dos sonhos', targetAmount: 5000, category: 'Viagem-e2e' })
+      .send({ name: 'Dream trip', targetAmount: 5000, category: 'Travel-e2e' })
       .expect(201);
     const id = create.body.id as string;
 
@@ -81,10 +81,10 @@ describe('Goals (e2e)', () => {
       .post('/api/transactions')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        description: 'Bônus',
+        description: 'Bonus',
         amount: 300,
         type: 'income',
-        category: 'Viagem-e2e',
+        category: 'Travel-e2e',
       })
       .expect(201);
 
@@ -93,10 +93,10 @@ describe('Goals (e2e)', () => {
       .post('/api/transactions')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        description: 'Passagem',
+        description: 'Ticket',
         amount: 999,
         type: 'expense',
-        category: 'Viagem-e2e',
+        category: 'Travel-e2e',
       })
       .expect(201);
 
@@ -113,17 +113,17 @@ describe('Goals (e2e)', () => {
     const create = await request(app.getHttpServer())
       .post('/api/goals')
       .set('Authorization', `Bearer ${token}`)
-      .send({ name: 'Temporária', targetAmount: 10 })
+      .send({ name: 'Temporary', targetAmount: 10 })
       .expect(201);
     const id = create.body.id as string;
 
     await request(app.getHttpServer())
       .patch(`/api/goals/${id}`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ name: 'Renomeada' })
+      .send({ name: 'Renamed' })
       .expect(200)
       .expect(({ body }) => {
-        expect(body.name).toBe('Renomeada');
+        expect(body.name).toBe('Renamed');
       });
 
     await request(app.getHttpServer())

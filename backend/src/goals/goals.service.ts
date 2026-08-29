@@ -68,7 +68,7 @@ export class GoalsService {
   async remove(userId: number, id: number): Promise<void> {
     const result = await this.goalsRepository.delete({ id, user: { id: userId } });
     if (!result.affected) {
-      throw new NotFoundException('Meta não encontrada.');
+      throw new NotFoundException('Goal not found.');
     }
   }
 
@@ -95,7 +95,7 @@ export class GoalsService {
       where: { id, user: { id: userId } },
     });
     if (!goal) {
-      throw new NotFoundException('Meta não encontrada.');
+      throw new NotFoundException('Goal not found.');
     }
     return goal;
   }
