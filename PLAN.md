@@ -101,7 +101,7 @@ Root-level `docker-compose.yml` (replacing `backend/docker-compose.yml`) with se
 | I1 | ✅ done | Root compose: `db` + `backend`, `.env` fix, healthchecks | can run alongside B1-B2 |
 | I2 | ✅ done | Backend multi-stage Dockerfile | verified with a full `docker compose up --build` + curl smoke test |
 | I3 | ⬜ pending | Frontend multi-stage Dockerfile + nginx SPA config | finalized once frontend builds, can scaffold early |
-| I4 | ⬜ pending | Add `prometheus` + `grafana` services + provisioning files | depends on B9 |
+| I4 | ✅ done | Add `prometheus` + `grafana` services + provisioning files | depends on B9 — verified live: Prometheus scrapes `backend:3001/api/metrics`, Grafana auto-provisions the Prometheus datasource + a starter dashboard |
 | I5 | ✅ done | Update root/backend README with compose instructions + secret-rotation note | done alongside I1/I2; will need another pass once frontend/observability land |
 
 ## Frontend — architecture
