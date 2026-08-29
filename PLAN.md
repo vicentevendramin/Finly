@@ -76,8 +76,8 @@ backend/src/
 | B6 | ✅ done | `GoalsModule`: `Goal` + `GoalContribution` entities, CRUD, contribution endpoint, aggregated progress read | depends on B3 — verified with unit + e2e tests incl. the hybrid manual+category-linked progress calc |
 | B7 | ✅ done | `ReportsModule`: balance-by-period, category breakdown, month-over-month, CSV export (hand-rolled — `json2csv` alpha had no usable types) + PDF export (`pdfkit`) | pure queries over `Transaction`, no new entity — verified with unit + e2e tests |
 | B8 | ✅ done | `role` rollout + `RolesGuard` + `AdminModule` (stats, error log endpoint) + `ErrorLog` entity wired into the exception filter | filter is now DI-managed (`APP_FILTER` in `CommonModule`) instead of manually `new`'d in `main.ts`, so it can inject the `ErrorLog` repository |
-| B9 | ⬜ pending | `ObservabilityModule` (`/metrics`, `/health`, metrics interceptor) | `@willsoto/nestjs-prometheus` doesn't yet support Nest 12 peer deps — may need `prom-client` directly |
-| B10 | ⬜ pending | Unit + e2e tests for Goals/Reports/Admin | closes agreed test scope |
+| B9 | ✅ done | `ObservabilityModule` (`/metrics`, `/health`, metrics interceptor) | used `@prometheus-io/client` directly (the official successor to the now-deprecated `prom-client`) instead of `@willsoto/nestjs-prometheus`, which still doesn't support Nest 12 peer deps |
+| B10 | ✅ done | Unit + e2e tests for Goals/Reports/Admin | closes agreed test scope — 36 unit + 25 e2e passing, plus a fix for e2e file-parallelism racing on migrationsRun |
 
 ## Rename to Finly ✅ done
 

@@ -10,6 +10,7 @@ import { TransactionsModule } from './transactions/transactions.module.js';
 import { GoalsModule } from './goals/goals.module.js';
 import { ReportsModule } from './reports/reports.module.js';
 import { AdminModule } from './admin/admin.module.js';
+import { ObservabilityModule } from './observability/observability.module.js';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AdminModule } from './admin/admin.module.js';
     GoalsModule,
     ReportsModule,
     AdminModule,
+    ObservabilityModule,
   ],
   controllers: [HealthController],
 })
