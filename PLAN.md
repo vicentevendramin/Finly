@@ -100,7 +100,7 @@ Root-level `docker-compose.yml` (replacing `backend/docker-compose.yml`) with se
 |---|---|---|---|
 | I1 | ✅ done | Root compose: `db` + `backend`, `.env` fix, healthchecks | can run alongside B1-B2 |
 | I2 | ✅ done | Backend multi-stage Dockerfile | verified with a full `docker compose up --build` + curl smoke test |
-| I3 | ⬜ pending | Frontend multi-stage Dockerfile + nginx SPA config | finalized once frontend builds, can scaffold early |
+| I3 | ✅ done | Frontend multi-stage Dockerfile + nginx SPA config | nginx also reverse-proxies `/api` to the backend service (same-origin from the browser, sidesteps CORS/hostname coupling entirely — portable to any self-hosted domain/IP without rebuilding). Hit and fixed a real gotcha: the healthcheck's `wget http://localhost/` failed because the container resolves `localhost` to `::1` first and nginx only binds IPv4 — switched to `127.0.0.1`. Verified live: full 5-service `docker compose up` stack, register/login/create-transaction through the Dockerized frontend, reload survives via SPA fallback |
 | I4 | ✅ done | Add `prometheus` + `grafana` services + provisioning files | depends on B9 — verified live: Prometheus scrapes `backend:3001/api/metrics`, Grafana auto-provisions the Prometheus datasource + a starter dashboard |
 | I5 | ✅ done | Update root/backend README with compose instructions + secret-rotation note | done alongside I1/I2; will need another pass once frontend/observability land |
 

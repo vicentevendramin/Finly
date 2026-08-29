@@ -15,9 +15,11 @@ Uma aplicação web _full-stack_ que permite ao usuário:
 - Visualizar um dashboard imediato com o balanço (Receitas x Despesas).
 
 ## 🚀 Stack de Tecnologia
-- **Frontend:** React
-- **Backend:** Node.js (com Express.js)
+- **Frontend:** React + TypeScript + Vite, TanStack Query, Zustand, i18next
+- **Backend:** NestJS + TypeORM
 - **Database:** PostgreSQL
+- **Observabilidade:** Prometheus + Grafana
+- **Deploy:** Docker Compose (self-hosted)
 
 ## 🛠️ Metodologia e Planejamento
 - **Design de Interface (UI/UX):** Prototipação de alta fidelidade realizada no Figma.

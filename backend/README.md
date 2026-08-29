@@ -13,7 +13,7 @@ docker compose up -d         # subsequentes, em segundo plano
 
 As migrations do TypeORM rodam automaticamente (`migrationsRun: true`) assim que o container do backend sobe — não há mais um passo manual de `db:init`.
 
-Isso sobe: Postgres, o backend em `http://localhost:3001`, Prometheus em `http://localhost:9090` (raspando `/api/metrics` a cada 15s) e Grafana em `http://localhost:3300` (login `admin`/`GRAFANA_ADMIN_PASSWORD`, já com o datasource do Prometheus e um dashboard "Finly Backend" provisionados — ver `infra/prometheus/` e `infra/grafana/`).
+Isso sobe: Postgres, o backend em `http://localhost:3001`, o frontend em `http://localhost:3000` (Nginx servindo o build de produção, com `/api` já proxiado para o backend — é essa URL que você acessa no navegador, não a `:3001`), Prometheus em `http://localhost:9090` (raspando `/api/metrics` a cada 15s) e Grafana em `http://localhost:3300` (login `admin`/`GRAFANA_ADMIN_PASSWORD`, já com o datasource do Prometheus e um dashboard "Finly Backend" provisionados — ver `infra/prometheus/` e `infra/grafana/`).
 
 ## Desenvolvimento local (sem Docker)
 
