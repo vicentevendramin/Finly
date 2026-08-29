@@ -46,7 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Logo / Título */}
       <div className="p-6 border-b">
         <h1 className="text-2xl font-bold text-blue-600">
-          Meu Termômetro
+          Finly
         </h1>
       </div>
 

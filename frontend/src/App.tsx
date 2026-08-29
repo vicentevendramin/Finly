@@ -124,7 +124,7 @@ function App() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 text-xl font-medium">
-        Carregando Termômetro Financeiro...
+        Carregando Finly...
       </div>
     );
   }

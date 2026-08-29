@@ -1,5 +1,5 @@
-# Meu Termômetro Financeiro 🌡️
-Este é o repositório do "Meu Termômetro Financeiro", um projeto de MVP (Mínimo Produto Viável) desenvolvido como parte de um trabalho acadêmico. O objetivo principal é criar uma aplicação web simples, clara e intuitiva para o controle financeiro pessoal, servindo como um substituto moderno e focado para planilhas complexas.
+# Finly 🌡️
+Finly (anteriormente "Meu Termômetro Financeiro") é uma aplicação web de controle financeiro pessoal, nascida como projeto de MVP (Mínimo Produto Viável) acadêmico. O objetivo principal é criar uma aplicação simples, clara e intuitiva para o controle financeiro pessoal, servindo como um substituto moderno e focado para planilhas complexas.
 
 O projeto foca em entregar a proposta de valor central: dar ao usuário clareza imediata sobre suas receitas e despesas com o mínimo de esforço.
 

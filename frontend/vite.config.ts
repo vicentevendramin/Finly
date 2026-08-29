@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: '/Meu-Termometro-Financeiro/',
+  base: '/',
   server: {
     port: 3000,
   }
