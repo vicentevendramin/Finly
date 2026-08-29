@@ -91,6 +91,7 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
           </h3>
           <button
             onClick={onClose}
+            aria-label={t('common.close')}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           >
             <X className="w-6 h-6" />

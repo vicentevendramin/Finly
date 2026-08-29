@@ -3,6 +3,7 @@
     "loading": "Carregando Finly...",
     "edit": "Editar",
     "delete": "Excluir",
+    "close": "Fechar",
     "confirmDeleteTransaction": "Tem certeza que deseja excluir esta transação?"
   },
   "sidebar": {
