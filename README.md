@@ -3,6 +3,8 @@ Finly (anteriormente "Meu Termômetro Financeiro") é uma aplicação web de con
 
 O projeto foca em entregar a proposta de valor central: dar ao usuário clareza imediata sobre suas receitas e despesas com o mínimo de esforço.
 
+[Clique aqui](https://vicentevendramin.github.io/Meu-Termometro-Financeiro/) para testar o App, os serviços do Back-end estão mockados no Front-end.
+
 ## 🎯 O Problema
 Muitas pessoas tentam gerenciar suas finanças com planilhas, mas acham o processo complexo, manual e difícil de acessar em dispositivos móveis. Isso leva à desistência, gerando falta de clareza e estresse financeiro.
 

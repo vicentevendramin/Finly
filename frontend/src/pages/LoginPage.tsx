@@ -9,9 +9,8 @@ interface LoginProps {
 }
 
 export default function LoginPage({ onLogin, onNavigate }: LoginProps) {
-  // Valores padrão para facilitar o teste, como no seu apiService
-  const [email, setEmail] = useState('teste@teste.com');
-  const [password, setPassword] = useState('123'); // O mock não valida a senha
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
