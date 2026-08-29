@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { NewTransactionData, Transaction } from '../types';
 import { X } from 'lucide-react';
+import { labelClass, primaryButtonClass, textInputClass } from '../styles/formStyles';
 
 interface ModalProps {
   isOpen: boolean;
@@ -79,23 +80,23 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
 
   return (
     // Backdrop
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
       {/* Conteúdo do Modal */}
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg z-50">
         {/* Header do Modal */}
-        <div className="flex justify-between items-center p-6 border-b">
+        <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
           {/* ítulo dinâmico */}
-          <h3 className="text-2xl font-semibold text-gray-800">
+          <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
             {transactionToEdit ? t('transactionModal.editTitle') : t('transactionModal.newTitle')}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
-        
+
         {/* Formulário */}
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
@@ -106,8 +107,8 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
                 onClick={() => setType('expense')}
                 className={`py-3 rounded-lg font-semibold ${
                   type === 'expense'
-                    ? 'bg-red-600 text-white shadow-lg'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-danger-600 text-white shadow-lg'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }`}
               >
                 {t('transactionModal.expense')}
@@ -117,8 +118,8 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
                 onClick={() => setType('income')}
                 className={`py-3 rounded-lg font-semibold ${
                   type === 'income'
-                    ? 'bg-green-600 text-white shadow-lg'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-success-600 text-white shadow-lg'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
                 }`}
               >
                 {t('transactionModal.income')}
@@ -127,7 +128,7 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
 
             {/* Valor */}
             <div>
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="amount" className={`${labelClass} mb-1`}>
                 {t('transactionModal.amountLabel')}
               </label>
               <input
@@ -136,13 +137,13 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
                 value={amount}
                 onChange={handleAmountChange}
                 placeholder={t('transactionModal.amountPlaceholder')}
-                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={textInputClass}
               />
             </div>
 
             {/* Descrição */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="description" className={`${labelClass} mb-1`}>
                 {t('transactionModal.descriptionLabel')}
               </label>
               <input
@@ -151,13 +152,13 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t('transactionModal.descriptionPlaceholder')}
-                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={textInputClass}
               />
             </div>
 
             {/* Categoria */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="category" className={`${labelClass} mb-1`}>
                 {t('transactionModal.categoryLabel')}
               </label>
               <input
@@ -166,21 +167,17 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder={t('transactionModal.categoryPlaceholder')}
-                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={textInputClass}
               />
               {/* TODO: Substituir por um <select> com categorias pré-definidas */}
             </div>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-danger-500 text-sm">{error}</p>}
           </div>
 
           {/* Botão Salvar */}
           <div className="mt-8">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
+            <button type="submit" disabled={isLoading} className={primaryButtonClass}>
               {isLoading
                 ? t('transactionModal.saving')
                 : transactionToEdit

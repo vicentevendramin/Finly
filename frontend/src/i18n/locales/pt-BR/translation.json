@@ -12,7 +12,10 @@
     "goals": "Metas",
     "reports": "Relatórios",
     "role": "Usuário",
-    "logout": "Sair"
+    "logout": "Sair",
+    "toggleTheme": "Alternar tema",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu"
   },
   "auth": {
     "login": {

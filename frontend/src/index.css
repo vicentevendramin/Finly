@@ -1,4 +1,49 @@
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+/* Class-based dark mode: `dark:` utilities apply when an ancestor has
+   the `dark` class (toggled by store/themeStore.ts), not just by OS
+   preference. See STYLEGUIDE.md for the full palette/rationale. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary — blue. 600 matches the blue-600 already used throughout
+     the original UI, so this reads as a refinement, not a rebrand. */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+
+  /* Accent — warm amber, complementary to primary blue. Used for
+     secondary emphasis and "attention" states (e.g. a negative
+     balance, a goal close to its deadline). Not used for the
+     income/expense semantics below. */
+  --color-accent-50: #fffbeb;
+  --color-accent-100: #fef3c7;
+  --color-accent-200: #fde68a;
+  --color-accent-300: #fcd34d;
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
+  --color-accent-700: #b45309;
+  --color-accent-800: #92400e;
+  --color-accent-900: #78350f;
+
+  /* Semantic tokens — formalizes the green/red used ad-hoc throughout
+     the original UI for income vs. expense and destructive actions. */
+  --color-success-50: #ecfdf5;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+
+  --color-danger-50: #fff1f2;
+  --color-danger-500: #f43f5e;
+  --color-danger-600: #e11d48;
+  --color-danger-700: #be123c;
+}

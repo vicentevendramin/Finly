@@ -7,6 +7,9 @@ interface UiState {
   openNewModal: () => void;
   openEditModal: (tx: Transaction) => void;
   closeModal: () => void;
+  isMobileMenuOpen: boolean;
+  openMobileMenu: () => void;
+  closeMobileMenu: () => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -15,4 +18,7 @@ export const useUiStore = create<UiState>((set) => ({
   openNewModal: () => set({ isModalOpen: true, editingTransaction: null }),
   openEditModal: (tx) => set({ isModalOpen: true, editingTransaction: tx }),
   closeModal: () => set({ isModalOpen: false, editingTransaction: null }),
+  isMobileMenuOpen: false,
+  openMobileMenu: () => set({ isMobileMenuOpen: true }),
+  closeMobileMenu: () => set({ isMobileMenuOpen: false }),
 }));

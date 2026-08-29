@@ -12,7 +12,10 @@
     "goals": "Goals",
     "reports": "Reports",
     "role": "User",
-    "logout": "Log out"
+    "logout": "Log out",
+    "toggleTheme": "Toggle theme",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "auth": {
     "login": {
