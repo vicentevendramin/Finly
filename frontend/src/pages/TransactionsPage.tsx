@@ -1,33 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import type { Transaction } from '../types';
-import { apiService } from '../services/apiService';
-import { Pencil, Trash2 } from 'lucide-react'; // Ícones para os botões
+import React from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
+import { useDeleteTransaction, useTransactions } from '../hooks/useTransactions';
+import { useUiStore } from '../store/uiStore';
 
-// Props para os handlers
-interface TransactionsPageProps {
-  onEdit: (tx: Transaction) => void;
-  onDelete: (id: string) => void;
-}
+const TransactionsPage: React.FC = () => {
+  const { data: transactions = [], isLoading, isError } = useTransactions();
+  const openEditModal = useUiStore((state) => state.openEditModal);
+  const deleteTransaction = useDeleteTransaction();
 
-const TransactionsPage: React.FC<TransactionsPageProps> = ({ onEdit, onDelete }) => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const handleDelete = (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir esta transação?')) {
+      deleteTransaction.mutate(id);
+    }
+  };
 
-  useEffect(() => {
-    setLoading(true);
-    apiService.getTransactions()
-      .then(data => {
-        setTransactions(data);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError('Falha ao carregar transações.');
-      })
-      .finally(() => setLoading(false));
-  }, []); // Roda apenas uma vez quando a página é montada
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="bg-white p-6 rounded-2xl shadow-xl">
         <h3 className="text-2xl font-semibold mb-6 text-gray-800">
@@ -38,10 +25,10 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ onEdit, onDelete })
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="bg-white p-6 rounded-2xl shadow-xl">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500">Falha ao carregar transações.</p>
       </div>
     );
   }
@@ -87,16 +74,15 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ onEdit, onDelete })
                     <div className="text-sm text-gray-500">{new Date(t.date).toLocaleDateString()}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                    {/* [NOVO] Botões de Ação */}
                     <button
-                      onClick={() => onEdit(t)}
+                      onClick={() => openEditModal(t)}
                       className="text-blue-600 hover:text-blue-900"
                       title="Editar"
                     >
                       <Pencil className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => onDelete(t.id)}
+                      onClick={() => handleDelete(t.id)}
                       className="text-red-600 hover:text-red-900"
                       title="Excluir"
                     >

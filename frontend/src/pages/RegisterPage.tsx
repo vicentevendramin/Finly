@@ -1,15 +1,11 @@
 import { useState } from 'react';
-import type { User } from '../types';
-// Importa o serviço
-import { apiService } from '../services/apiService'; 
+import { Link, useNavigate } from 'react-router-dom';
+import { apiService } from '../services/apiService';
+import { useAuthStore } from '../store/authStore';
 
-interface RegisterProps {
-  // onRegister pode fazer o login automático ou apenas redirecionar para a tela de login
-  onRegister: (user: User) => void; 
-  onNavigate: (page: 'login') => void;
-}
-
-export default function RegisterPage({ onRegister, onNavigate }: RegisterProps) {
+export default function RegisterPage() {
+  const navigate = useNavigate();
+  const setUser = useAuthStore((state) => state.setUser);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,7 +16,6 @@ export default function RegisterPage({ onRegister, onNavigate }: RegisterProps) 
     e.preventDefault();
     setError('');
 
-    // Validação simples no frontend
     if (password !== confirmPassword) {
       setError('As senhas não coincidem.');
       return;
@@ -33,18 +28,17 @@ export default function RegisterPage({ onRegister, onNavigate }: RegisterProps) 
 
     setIsLoading(true);
     try {
-      // Chama o método register do seu apiService (que vai bater no POST /api/auth/register)
-      const user = await apiService.register(email, password); 
-      onRegister(user); // Redireciona o usuário ou atualiza o estado global no App.tsx
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar conta. Tente novamente.');
+      const user = await apiService.register(email, password);
+      setUser(user);
+      navigate('/app/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao criar conta. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    // Layout centralizado do Tailwind (idêntico ao Login para manter a consistência)
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-8">
@@ -68,7 +62,7 @@ export default function RegisterPage({ onRegister, onNavigate }: RegisterProps) 
               placeholder="seu@email.com"
             />
           </div>
-          
+
           <div>
             <label
               htmlFor="password"
@@ -104,9 +98,9 @@ export default function RegisterPage({ onRegister, onNavigate }: RegisterProps) 
               placeholder="••••••"
             />
           </div>
-          
+
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-          
+
           <div>
             <button
               type="submit"
@@ -117,15 +111,12 @@ export default function RegisterPage({ onRegister, onNavigate }: RegisterProps) 
             </button>
           </div>
         </form>
-        
+
         <p className="mt-6 text-center text-sm text-gray-600">
           Já tem uma conta?{' '}
-          <button
-            onClick={() => onNavigate('login')}
-            className="font-medium text-blue-600 hover:text-blue-500"
-          >
+          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
             Faça login
-          </button>
+          </Link>
         </p>
       </div>
     </div>

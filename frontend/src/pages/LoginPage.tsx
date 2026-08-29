@@ -1,14 +1,11 @@
 import { useState } from 'react';
-import type { User } from '../types';
-// Importa o serviço
-import { apiService } from '../services/apiService'; 
+import { Link, useNavigate } from 'react-router-dom';
+import { apiService } from '../services/apiService';
+import { useAuthStore } from '../store/authStore';
 
-interface LoginProps {
-  onLogin: (user: User) => void;
-  onNavigate: (page: 'register') => void;
-}
-
-export default function LoginPage({ onLogin, onNavigate }: LoginProps) {
+export default function LoginPage() {
+  const navigate = useNavigate();
+  const setUser = useAuthStore((state) => state.setUser);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,18 +16,17 @@ export default function LoginPage({ onLogin, onNavigate }: LoginProps) {
     setError('');
     setIsLoading(true);
     try {
-      // O mock espera (email, password_hash), mas só valida o email
-      const user = await apiService.login(email, password); 
-      onLogin(user); // Chama a função do App.tsx para mudar de página
-    } catch (err: any) {
-      setError(err.message || 'E-mail ou senha inválidos.');
+      const user = await apiService.login(email, password);
+      setUser(user);
+      navigate('/app/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'E-mail ou senha inválidos.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    // Layout centralizado do Tailwind
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-8">
@@ -69,9 +65,9 @@ export default function LoginPage({ onLogin, onNavigate }: LoginProps) {
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          
+
           {error && <p className="text-red-500 text-sm">{error}</p>}
-          
+
           <div>
             <button
               type="submit"
@@ -84,12 +80,9 @@ export default function LoginPage({ onLogin, onNavigate }: LoginProps) {
         </form>
         <p className="mt-6 text-center text-sm text-gray-600">
           Não tem uma conta?{' '}
-          <button
-            onClick={() => onNavigate('register')}
-            className="font-medium text-blue-600 hover:text-blue-500"
-          >
+          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
             Cadastre-se
-          </button>
+          </Link>
         </p>
       </div>
     </div>

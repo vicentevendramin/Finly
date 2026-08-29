@@ -122,8 +122,8 @@ Root-level `docker-compose.yml` (replacing `backend/docker-compose.yml`) with se
 
 | # | Status | Task | Depends on |
 |---|---|---|---|
-| F1 | ⬜ pending | Add React Router + TanStack Query + Zustand; refactor `App.tsx`/`AppLayout.tsx` off `activeView`/`page` state for the *existing* pages (Login/Register/Dashboard/Transactions) only | parity checkpoint before extending scope |
-| F2 | ⬜ pending | Migrate remaining `apiService` call sites to Query hooks, delete `keyForRefresh` entirely | F1 |
+| F1 | ✅ done | Add React Router + TanStack Query + Zustand; refactor `App.tsx`/`AppLayout.tsx` off `activeView`/`page` state for the *existing* pages (Login/Register/Dashboard/Transactions) only | parity checkpoint before extending scope — verified live with a headless-browser walkthrough (register → dashboard → create/edit transaction → reload → logout → re-login), zero console errors |
+| F2 | ✅ done | Migrate remaining `apiService` call sites to Query hooks, delete `keyForRefresh` entirely | F1 — done together with F1: Dashboard/Transactions now use `useTransactions`/`useCreateTransaction`/`useUpdateTransaction`/`useDeleteTransaction`, no manual remount-to-refetch anywhere |
 | F3 | ⬜ pending | i18next setup + string extraction for existing pages, language switcher | can run parallel to F1/F2 |
 | F4 | ⬜ pending | Design tokens (`@theme`, blue+amber palette, dark mode) + restyle Sidebar/Layout/Login/Register/Dashboard/Transactions + responsive drawer/bottom-nav | F1 |
 | F5 | ⬜ pending | Goals page: real CRUD, manual contribution UI, category-link picker, combined progress bar | depends on **B6** |

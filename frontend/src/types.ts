@@ -21,5 +21,3 @@ export interface Goal {
   currentAmount: number;
   targetAmount: number;
 }
-
-export type ActiveView = 'dashboard' | 'transactions' | 'goals' | 'reports' | 'login' | 'register';
