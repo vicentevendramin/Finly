@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Dados Falsos para as Metas
 const fakeGoals = [
@@ -8,9 +9,10 @@ const fakeGoals = [
 ];
 
 const GoalsList: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="bg-white p-6 rounded-2xl shadow-xl">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6">Metas</h3>
+      <h3 className="text-2xl font-bold text-gray-800 mb-6">{t('dashboard.goalsTitle')}</h3>
       
       <ul className="space-y-6">
         {fakeGoals.map(goal => {

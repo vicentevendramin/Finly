@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { apiService } from '../services/apiService';
 import { useAuthStore } from '../store/authStore';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const setUser = useAuthStore((state) => state.setUser);
   const [email, setEmail] = useState('');
@@ -20,7 +22,7 @@ export default function LoginPage() {
       setUser(user);
       navigate('/app/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'E-mail ou senha inválidos.');
+      setError(err instanceof Error ? err.message : t('auth.login.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -30,7 +32,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-8">
-          Login
+          {t('auth.login.title')}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -38,7 +40,7 @@ export default function LoginPage() {
               htmlFor="email"
               className="block text-sm font-medium text-gray-700"
             >
-              Email
+              {t('auth.login.email')}
             </label>
             <input
               type="email"
@@ -54,7 +56,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700"
             >
-              Senha
+              {t('auth.login.password')}
             </label>
             <input
               type="password"
@@ -74,14 +76,14 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {isLoading ? 'Entrando...' : 'Entrar'}
+              {isLoading ? t('auth.login.submitting') : t('auth.login.submit')}
             </button>
           </div>
         </form>
         <p className="mt-6 text-center text-sm text-gray-600">
-          Não tem uma conta?{' '}
+          {t('auth.login.noAccount')}{' '}
           <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-            Cadastre-se
+            {t('auth.login.registerLink')}
           </Link>
         </p>
       </div>

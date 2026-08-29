@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { apiService } from './services/apiService';
 import { useAuthStore } from './store/authStore';
 
@@ -15,6 +16,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import PublicOnlyRoute from './routes/PublicOnlyRoute';
 
 function App() {
+  const { t } = useTranslation();
   const setUser = useAuthStore((state) => state.setUser);
   const [isBootstrapping, setIsBootstrapping] = useState(true);
 
@@ -29,7 +31,7 @@ function App() {
   if (isBootstrapping) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 text-xl font-medium">
-        Carregando Finly...
+        {t('common.loading')}
       </div>
     );
   }

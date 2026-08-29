@@ -1,0 +1,94 @@
+{
+  "common": {
+    "loading": "Carregando Finly...",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "confirmDeleteTransaction": "Tem certeza que deseja excluir esta transação?"
+  },
+  "sidebar": {
+    "newTransaction": "Nova Transação",
+    "dashboard": "Dashboard",
+    "transactions": "Transações",
+    "goals": "Metas",
+    "reports": "Relatórios",
+    "role": "Usuário",
+    "logout": "Sair"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Senha",
+      "submitting": "Entrando...",
+      "submit": "Entrar",
+      "noAccount": "Não tem uma conta?",
+      "registerLink": "Cadastre-se",
+      "genericError": "E-mail ou senha inválidos."
+    },
+    "register": {
+      "title": "Cadastre-se",
+      "email": "Email",
+      "emailPlaceholder": "seu@email.com",
+      "password": "Senha",
+      "passwordPlaceholder": "••••••",
+      "confirmPassword": "Confirmar Senha",
+      "submitting": "Criando conta...",
+      "submit": "Criar Conta",
+      "haveAccount": "Já tem uma conta?",
+      "loginLink": "Faça login",
+      "passwordMismatch": "As senhas não coincidem.",
+      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres.",
+      "genericError": "Erro ao criar conta. Tente novamente."
+    }
+  },
+  "dashboard": {
+    "income": "Receitas",
+    "expenses": "Despesas",
+    "balance": "Saldo",
+    "recentTransactions": "Lançamentos Recentes",
+    "loadingTransactions": "Carregando transações...",
+    "noTransactions": "Nenhuma transação encontrada.",
+    "categoryChartTitle": "Gastos por Categoria",
+    "categoryChartPlaceholder": "Placeholder para o Gráfico",
+    "goalsTitle": "Metas"
+  },
+  "transactions": {
+    "title": "Todas as Transações",
+    "loading": "Carregando transações...",
+    "loadError": "Falha ao carregar transações.",
+    "empty": "Nenhuma transação encontrada.",
+    "columns": {
+      "description": "Descrição",
+      "amount": "Valor",
+      "category": "Categoria",
+      "date": "Data",
+      "actions": "Ações"
+    }
+  },
+  "transactionModal": {
+    "editTitle": "Editar Transação",
+    "newTitle": "Nova Transação",
+    "expense": "Despesa",
+    "income": "Receita",
+    "amountLabel": "Valor (R$)",
+    "amountPlaceholder": "0.00",
+    "descriptionLabel": "Descrição",
+    "descriptionPlaceholder": "Ex: Almoço, Salário",
+    "categoryLabel": "Categoria",
+    "categoryPlaceholder": "Ex: Alimentação, Moradia",
+    "validationError": "Por favor, preencha todos os campos.",
+    "saving": "Salvando...",
+    "saveChanges": "Salvar Alterações",
+    "saveNew": "Salvar Transação"
+  },
+  "goalsPage": {
+    "title": "Minhas Metas",
+    "underConstruction": "Página de Metas em construção.",
+    "comingSoon": "Em breve você poderá cadastrar e acompanhar seus objetivos aqui!"
+  },
+  "reportsPage": {
+    "title": "Relatórios",
+    "underConstruction": "Página de Relatórios em construção.",
+    "comingSoon": "Em breve você verá gráficos e análises detalhadas aqui!"
+  }
+}

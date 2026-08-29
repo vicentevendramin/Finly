@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 
 import CategoryChart from '../components/CategoryChart';
@@ -7,12 +8,13 @@ import { useDeleteTransaction, useTransactions } from '../hooks/useTransactions'
 import { useUiStore } from '../store/uiStore';
 
 const DashboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const { data: transactions = [], isLoading } = useTransactions();
   const openEditModal = useUiStore((state) => state.openEditModal);
   const deleteTransaction = useDeleteTransaction();
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta transação?')) {
+    if (window.confirm(t('common.confirmDeleteTransaction'))) {
       deleteTransaction.mutate(id);
     }
   };
@@ -37,21 +39,21 @@ const DashboardPage: React.FC = () => {
         {/* Cards de Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-green-500">
-            <h3 className="text-sm font-medium text-gray-500 uppercase">Receitas</h3>
+            <h3 className="text-sm font-medium text-gray-500 uppercase">{t('dashboard.income')}</h3>
             <p className="text-3xl font-bold text-gray-900 mt-2">
               {isLoading ? '...' : `R$ ${summary.totalReceitas.toFixed(2)}`}
             </p>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-red-500">
-            <h3 className="text-sm font-medium text-gray-500 uppercase">Despesas</h3>
+            <h3 className="text-sm font-medium text-gray-500 uppercase">{t('dashboard.expenses')}</h3>
             <p className="text-3xl font-bold text-gray-900 mt-2">
               {isLoading ? '...' : `R$ ${summary.totalDespesas.toFixed(2)}`}
             </p>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-blue-500">
-            <h3 className="text-sm font-medium text-gray-500 uppercase">Saldo</h3>
+            <h3 className="text-sm font-medium text-gray-500 uppercase">{t('dashboard.balance')}</h3>
             <p className="text-3xl font-bold text-gray-900 mt-2">
               {isLoading ? '...' : `R$ ${summary.saldoMes.toFixed(2)}`}
             </p>
@@ -61,37 +63,37 @@ const DashboardPage: React.FC = () => {
         {/* Lançamentos Recentes */}
         <div className="bg-white p-6 rounded-2xl shadow-xl">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">
-            Lançamentos Recentes
+            {t('dashboard.recentTransactions')}
           </h3>
           <div className="space-y-4">
             {isLoading ? (
-              <p className="text-gray-500">Carregando transações...</p>
+              <p className="text-gray-500">{t('dashboard.loadingTransactions')}</p>
             ) : transactions.length === 0 ? (
-              <p className="text-gray-500">Nenhuma transação encontrada.</p>
+              <p className="text-gray-500">{t('dashboard.noTransactions')}</p>
             ) : (
-              transactions.slice(0, 5).map((t) => (
-                <div key={t.id} className="flex justify-between items-center p-3 rounded-lg hover:bg-gray-50">
+              transactions.slice(0, 5).map((tx) => (
+                <div key={tx.id} className="flex justify-between items-center p-3 rounded-lg hover:bg-gray-50">
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{t.description}</p>
-                    <p className="text-sm text-gray-500">{t.category}</p>
+                    <p className="font-medium text-gray-900 truncate">{tx.description}</p>
+                    <p className="text-sm text-gray-500">{tx.category}</p>
                   </div>
                   <div className="flex-shrink-0 ml-4">
-                    <p className={`font-medium ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                      {t.type === 'income' ? '+' : '-'} R$ {t.amount.toFixed(2)}
+                    <p className={`font-medium ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      {tx.type === 'income' ? '+' : '-'} R$ {tx.amount.toFixed(2)}
                     </p>
                   </div>
                   <div className="flex-shrink-0 ml-4 space-x-2">
                     <button
-                      onClick={() => openEditModal(t)}
+                      onClick={() => openEditModal(tx)}
                       className="text-blue-500 hover:text-blue-700"
-                      title="Editar"
+                      title={t('common.edit')}
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(t.id)}
+                      onClick={() => handleDelete(tx.id)}
                       className="text-red-500 hover:text-red-700"
-                      title="Excluir"
+                      title={t('common.delete')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

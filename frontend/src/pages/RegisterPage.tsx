@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { apiService } from '../services/apiService';
 import { useAuthStore } from '../store/authStore';
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const setUser = useAuthStore((state) => state.setUser);
   const [email, setEmail] = useState('');
@@ -17,12 +19,12 @@ export default function RegisterPage() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('As senhas não coincidem.');
+      setError(t('auth.register.passwordMismatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres.');
+      setError(t('auth.register.passwordTooShort'));
       return;
     }
 
@@ -32,7 +34,7 @@ export default function RegisterPage() {
       setUser(user);
       navigate('/app/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar conta. Tente novamente.');
+      setError(err instanceof Error ? err.message : t('auth.register.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -42,7 +44,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-8">
-          Cadastre-se
+          {t('auth.register.title')}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -50,7 +52,7 @@ export default function RegisterPage() {
               htmlFor="email"
               className="block text-sm font-medium text-gray-700"
             >
-              Email
+              {t('auth.register.email')}
             </label>
             <input
               type="email"
@@ -59,7 +61,7 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="seu@email.com"
+              placeholder={t('auth.register.emailPlaceholder')}
             />
           </div>
 
@@ -68,7 +70,7 @@ export default function RegisterPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700"
             >
-              Senha
+              {t('auth.register.password')}
             </label>
             <input
               type="password"
@@ -77,7 +79,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="••••••"
+              placeholder={t('auth.register.passwordPlaceholder')}
             />
           </div>
 
@@ -86,7 +88,7 @@ export default function RegisterPage() {
               htmlFor="confirmPassword"
               className="block text-sm font-medium text-gray-700"
             >
-              Confirmar Senha
+              {t('auth.register.confirmPassword')}
             </label>
             <input
               type="password"
@@ -95,7 +97,7 @@ export default function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="••••••"
+              placeholder={t('auth.register.passwordPlaceholder')}
             />
           </div>
 
@@ -107,15 +109,15 @@ export default function RegisterPage() {
               disabled={isLoading}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {isLoading ? 'Criando conta...' : 'Criar Conta'}
+              {isLoading ? t('auth.register.submitting') : t('auth.register.submit')}
             </button>
           </div>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
-          Já tem uma conta?{' '}
+          {t('auth.register.haveAccount')}{' '}
           <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-            Faça login
+            {t('auth.register.loginLink')}
           </Link>
         </p>
       </div>
