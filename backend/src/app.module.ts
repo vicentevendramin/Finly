@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { TransactionsModule } from './transactions/transactions.module.js';
 import { GoalsModule } from './goals/goals.module.js';
+import { ReportsModule } from './reports/reports.module.js';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { GoalsModule } from './goals/goals.module.js';
     AuthModule,
     TransactionsModule,
     GoalsModule,
+    ReportsModule,
   ],
   controllers: [HealthController],
 })
