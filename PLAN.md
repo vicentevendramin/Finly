@@ -66,20 +66,20 @@ backend/src/
 
 ### Backend task order
 
-| # | Task | Notes |
-|---|---|---|
-| B1 | Scaffold NestJS: ConfigModule, global `ValidationPipe`, CORS (matching `server.js:13-17`), global `HttpExceptionFilter` | |
-| B2 | `DatabaseModule` + TypeORM (`forRootAsync` from same env vars as today: `DB_HOST/PORT/NAME/USER/PASSWORD`) | |
-| B3 | `UsersModule` + `AuthModule`: `User` entity (with `role` from day one), `JwtStrategy`/`JwtAuthGuard`, register/login/me at functional parity with `authController.js` | bcrypt cost 12 kept |
-| B4 | `TransactionsModule`: entity, DTOs, CRUD at parity with `transactionsController.js` (month filter, ownership checks, same JSON shape — `amount` as float, `date` as `YYYY-MM-DD`) | |
-| B5 | Unit + e2e tests for Auth + Transactions | parity checkpoint before cutting over the frontend |
-| B6 | `GoalsModule`: `Goal` + `GoalContribution` entities, CRUD, contribution endpoint, aggregated progress read | depends on B3 |
-| B7 | `ReportsModule`: balance-by-period, category breakdown, month-over-month, CSV export (`json2csv`) + PDF export (`pdfkit` — no Chromium needed) | pure queries over `Transaction`, no new entity |
-| B8 | `role` rollout + `RolesGuard` + `AdminModule` (stats, error log endpoint) + `ErrorLog` entity wired into the exception filter | |
-| B9 | `ObservabilityModule` (`/metrics`, `/health`, metrics interceptor) | |
-| B10 | Unit + e2e tests for Goals/Reports/Admin | closes agreed test scope |
+| # | Status | Task | Notes |
+|---|---|---|---|
+| B1 | ✅ done | Scaffold NestJS: ConfigModule, global `ValidationPipe`, CORS (matching `server.js:13-17`), global `HttpExceptionFilter` | Nest 12 (ESM/Vitest/oxlint — current CLI defaults) |
+| B2 | ✅ done | `DatabaseModule` + TypeORM (`forRootAsync` from same env vars as today: `DB_HOST/PORT/NAME/USER/PASSWORD`) | |
+| B3 | ✅ done | `UsersModule` + `AuthModule`: `User` entity (with `role` from day one), `JwtStrategy`/`JwtAuthGuard`, register/login/me at functional parity with `authController.js` | bcrypt cost 12 kept |
+| B4 | ✅ done | `TransactionsModule`: entity, DTOs, CRUD at parity with `transactionsController.js` (month filter, ownership checks, same JSON shape — `amount` as float, `date` as `YYYY-MM-DD`) | |
+| B5 | ✅ done | Unit + e2e tests for Auth + Transactions | parity checkpoint before cutting over the frontend — verified with curl + full suite against a real Postgres |
+| B6 | ⬜ pending | `GoalsModule`: `Goal` + `GoalContribution` entities, CRUD, contribution endpoint, aggregated progress read | depends on B3 |
+| B7 | ⬜ pending | `ReportsModule`: balance-by-period, category breakdown, month-over-month, CSV export (`json2csv`) + PDF export (`pdfkit` — no Chromium needed) | pure queries over `Transaction`, no new entity |
+| B8 | ⬜ pending | `role` rollout + `RolesGuard` + `AdminModule` (stats, error log endpoint) + `ErrorLog` entity wired into the exception filter | |
+| B9 | ⬜ pending | `ObservabilityModule` (`/metrics`, `/health`, metrics interceptor) | `@willsoto/nestjs-prometheus` doesn't yet support Nest 12 peer deps — may need `prom-client` directly |
+| B10 | ⬜ pending | Unit + e2e tests for Goals/Reports/Admin | closes agreed test scope |
 
-## Rename to Finly
+## Rename to Finly ✅ done
 
 Independent of everything else, no dependencies — do it early so all new code/docs/containers are written under the final name instead of being renamed twice. Touches:
 
@@ -96,13 +96,13 @@ Root-level `docker-compose.yml` (replacing `backend/docker-compose.yml`) with se
 
 **Secret hygiene fix (do this early, no dependencies)**: `backend/.env` is currently tracked in git with real credentials (`backend/.gitignore` only excludes `node_modules`). Add `.env.example` documenting required vars, gitignore the real `.env`, `git rm --cached backend/.env`, and flag to the user that the already-leaked JWT secret/DB password should be rotated in any real deployment.
 
-| # | Task | Depends on |
-|---|---|---|
-| I1 | Root compose: `db` + `backend`, `.env` fix, healthchecks | can run alongside B1-B2 |
-| I2 | Backend multi-stage Dockerfile | |
-| I3 | Frontend multi-stage Dockerfile + nginx SPA config | finalized once frontend builds, can scaffold early |
-| I4 | Add `prometheus` + `grafana` services + provisioning files | depends on B9 |
-| I5 | Update root/backend README with compose instructions + secret-rotation note | |
+| # | Status | Task | Depends on |
+|---|---|---|---|
+| I1 | ✅ done | Root compose: `db` + `backend`, `.env` fix, healthchecks | can run alongside B1-B2 |
+| I2 | ✅ done | Backend multi-stage Dockerfile | verified with a full `docker compose up --build` + curl smoke test |
+| I3 | ⬜ pending | Frontend multi-stage Dockerfile + nginx SPA config | finalized once frontend builds, can scaffold early |
+| I4 | ⬜ pending | Add `prometheus` + `grafana` services + provisioning files | depends on B9 |
+| I5 | ✅ done | Update root/backend README with compose instructions + secret-rotation note | done alongside I1/I2; will need another pass once frontend/observability land |
 
 ## Frontend — architecture
 
@@ -120,16 +120,16 @@ Root-level `docker-compose.yml` (replacing `backend/docker-compose.yml`) with se
 
 ### Frontend task order
 
-| # | Task | Depends on |
-|---|---|---|
-| F1 | Add React Router + TanStack Query + Zustand; refactor `App.tsx`/`AppLayout.tsx` off `activeView`/`page` state for the *existing* pages (Login/Register/Dashboard/Transactions) only | parity checkpoint before extending scope |
-| F2 | Migrate remaining `apiService` call sites to Query hooks, delete `keyForRefresh` entirely | F1 |
-| F3 | i18next setup + string extraction for existing pages, language switcher | can run parallel to F1/F2 |
-| F4 | Design tokens (`@theme`, blue+amber palette, dark mode) + restyle Sidebar/Layout/Login/Register/Dashboard/Transactions + responsive drawer/bottom-nav | F1 |
-| F5 | Goals page: real CRUD, manual contribution UI, category-link picker, combined progress bar | depends on **B6** |
-| F6 | Reports page: 4 sub-features + CSV/PDF export buttons | depends on **B7** |
-| F7 | Admin page: stat cards + recent-errors table, route-gated by role | depends on **B8** |
-| F8 | Frontend tests (Vitest + Testing Library) for critical hooks/components — scope to confirm, not explicitly requested like backend tests were | after F1-F7 |
+| # | Status | Task | Depends on |
+|---|---|---|---|
+| F1 | ⬜ pending | Add React Router + TanStack Query + Zustand; refactor `App.tsx`/`AppLayout.tsx` off `activeView`/`page` state for the *existing* pages (Login/Register/Dashboard/Transactions) only | parity checkpoint before extending scope |
+| F2 | ⬜ pending | Migrate remaining `apiService` call sites to Query hooks, delete `keyForRefresh` entirely | F1 |
+| F3 | ⬜ pending | i18next setup + string extraction for existing pages, language switcher | can run parallel to F1/F2 |
+| F4 | ⬜ pending | Design tokens (`@theme`, blue+amber palette, dark mode) + restyle Sidebar/Layout/Login/Register/Dashboard/Transactions + responsive drawer/bottom-nav | F1 |
+| F5 | ⬜ pending | Goals page: real CRUD, manual contribution UI, category-link picker, combined progress bar | depends on **B6** |
+| F6 | ⬜ pending | Reports page: 4 sub-features + CSV/PDF export buttons | depends on **B7** |
+| F7 | ⬜ pending | Admin page: stat cards + recent-errors table, route-gated by role | depends on **B8** |
+| F8 | ⬜ pending | Frontend tests (Vitest + Testing Library) for critical hooks/components — scope to confirm, not explicitly requested like backend tests were | after F1-F7 |
 
 ## Sequencing
 

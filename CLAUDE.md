@@ -6,31 +6,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Finly (formerly "Meu Termômetro Financeiro") is a full-stack personal finance tracker (Portuguese-language UI, undergoing an English rebrand). It's a monorepo with two independent projects — `backend/` and `frontend/` — each with its own `package.json` and no shared root tooling.
 
-**Note:** this project is mid-refactor — migrating the backend from Express to NestJS + TypeORM, and the frontend to React Router + TanStack Query + Zustand + i18next, per the plan at the top of this repo's git history around the "refactor" commits. Verify which parts of this doc still match reality before relying on it.
+**Note:** this project is mid-refactor per `PLAN.md` at the repo root — backend core (auth + transactions on NestJS/TypeORM) and Docker infra are done; Goals/Reports/Admin/Observability backend modules and the entire frontend refactor (router, TanStack Query, Zustand, i18n, design system) are still pending. Check `PLAN.md`'s task table for current status before assuming a section is finished.
 
-- **Frontend:** React 19 + TypeScript + Vite, styled with Tailwind CSS v4
-- **Backend:** Node.js + Express 5, PostgreSQL via `pg` (no ORM — raw SQL)
-- **Auth:** JWT (`jsonwebtoken`), passwords hashed with `bcryptjs`, token stored in `localStorage` on the frontend
-
-There are no automated tests in this repository yet.
+- **Frontend:** React 19 + TypeScript + Vite, styled with Tailwind CSS v4 (not yet refactored — still the original prop-drilled architecture, see below)
+- **Backend:** NestJS 12 (ESM, Vitest, oxlint — the current `nest new` defaults) + TypeORM + PostgreSQL
+- **Auth:** JWT via `@nestjs/passport`, passwords hashed with `bcryptjs`, token stored in `localStorage` on the frontend
+- Backend has unit tests (Vitest, mocked repositories) and e2e tests (Supertest against a real Postgres); frontend has none yet.
 
 ## Commands
 
-Run these from within `backend/` or `frontend/` respectively — there is no root-level script runner.
+Run these from within `backend/` or `frontend/` respectively — there is no root-level script runner, except the Docker Compose file which lives at the repo root.
 
 ### Backend (`backend/`)
 ```bash
-npm run dev        # start with nodemon (auto-reload)
-npm start          # start with plain node
-npm run db:init    # create/verify Postgres tables (src/db/init.js) — run after first `docker-compose up`
+npm run start:dev        # watch mode (reads backend/.env)
+npm run build            # nest build -> dist/
+npm run test             # unit tests (Vitest, no external deps)
+npm run test:e2e         # e2e tests (Supertest) — needs a real Postgres with migrations applied
+npm run migration:generate  # generate a migration from entity changes
+npm run migration:run       # apply pending migrations manually (outside Docker)
 ```
 
-Via Docker (see `backend/README.md`):
+Via Docker, from the repo root (see root `docker-compose.yml` and `backend/README.md`):
 ```bash
-docker-compose up --build   # first run / after Dockerfile changes — starts Postgres + backend
-docker exec -it finance_backend npm run db:init   # initialize DB schema inside the container
-docker-compose up -d        # subsequent runs, detached
+cp .env.example .env   # fill in DB_PASSWORD and JWT_SECRET
+docker compose up --build   # first run / after Dockerfile changes — builds + starts Postgres + backend
+docker compose up -d        # subsequent runs, detached
 ```
+Migrations run automatically on backend container startup (`migrationsRun: true` in `TypeOrmModule`) — no manual init step.
 
 ### Frontend (`frontend/`)
 ```bash
@@ -42,18 +45,20 @@ npm run preview    # preview production build
 
 ## Architecture
 
-### Backend — layered Express app
-`src/server.js` wires everything: CORS (origin from `FRONTEND_URL` env var), JSON body parsing, then mounts routers at `/api/auth` and `/api/transactions`, plus `/api/health`. Requests flow **routes → middleware → controllers → db pool**:
+### Backend — NestJS modules (`backend/src/`)
+Standard Nest module-per-domain layout: `auth/`, `users/`, `transactions/`, `database/`, `config/`, `common/`, `health/`. Requests flow **controller → service → TypeORM repository**, with DI wiring the controller's `@UseGuards(JwtAuthGuard)` to the `auth/` module.
 
-- `src/routes/*.js` — declares endpoints, applies `authMiddleware` to protected routes (all of `/api/transactions/*` via `router.use(authMiddleware)`)
-- `src/middleware/auth.js` — verifies the `Authorization: Bearer <token>` JWT, injects `req.user` (`{ id, email }`)
-- `src/controllers/*Controller.js` — request validation + SQL queries via the shared `pg` `Pool` (no service/repository layer)
-- `src/config/database.js` — the singleton `pg.Pool`, configured from `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASSWORD` env vars
-- `src/db/init.js` — idempotent schema setup (`CREATE TABLE IF NOT EXISTS`) for `users` and `transactions`; run manually, not on server boot
+- `main.ts` — global prefix `api`, CORS (from `FRONTEND_URL` env var), global `ValidationPipe` (class-validator DTOs), global `HttpExceptionFilter`
+- `common/filters/http-exception.filter.ts` — normalizes every error response back to `{error: string}` (not Nest's default `{statusCode, message, error}`) so the frontend's `apiService.ts` doesn't need to change
+- `auth/` — `JwtStrategy` + `JwtAuthGuard` (`@nestjs/passport`); any module whose controller uses `JwtAuthGuard` must import `AuthModule` (it exports the configured `PassportModule`), not just declare the guard — see `transactions/transactions.module.ts` for the pattern
+- `users/entities/user.entity.ts` — has a `role: 'user' | 'admin'` column already, unused until the admin-panel module lands
+- `transactions/` — `TransactionsService` maps TypeORM's `numeric` columns (returned as strings by `pg`) back to JS numbers, and dates stay as plain `YYYY-MM-DD` strings, matching what the frontend expects
+- `database/database.module.ts` — `TypeOrmModule.forRootAsync` reading `DB_HOST/PORT/NAME/USER/PASSWORD`, `synchronize: false`, `migrationsRun: true`; `database/data-source.ts` is a separate `DataSource` for the TypeORM CLI (`migration:generate`/`run`/`revert`), not used by the running app
+- `database/migrations/` — hand-written initial migration (no legacy data to preserve); every future schema change needs a new migration file here
 
-Every transactions query is scoped by `user_id` from the decoded JWT — when adding new transaction endpoints, preserve this per-user isolation (see `updateTransaction`/`deleteTransaction` in `transactionsController.js` for the pattern: verify ownership before mutating).
+Every transactions query is scoped by the JWT's decoded user id — when adding new endpoints on any per-user resource, preserve this pattern (see `transactions.service.ts`'s `update`/`remove`: look up scoped by `{id, user: {id: userId}}`, not by id alone).
 
-Env vars are loaded via `dotenv` from `backend/.env`. **Note:** `backend/.env` is currently committed to git (backend's `.gitignore` only excludes `node_modules`) — treat any secrets in it as already exposed, and be careful not to add new secrets there without addressing this.
+Env vars come from `backend/.env` locally (see `backend/.env.example`) or from the root `.env` file when using Docker Compose (see `.env.example` at the repo root). Neither real `.env` file is tracked in git.
 
 ### Frontend — single-page, prop-drilled state (no router, no global state library)
 `App.tsx` is the root state owner: it holds `user`, the current `page` ('login' | 'register' | 'app'), `activeView` (which section of the app is shown), and modal/editing state. There is no React Router — page/view switching is done via conditional rendering and a `page`/`activeView` string state machine.
