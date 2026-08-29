@@ -18,6 +18,21 @@ export type NewTransactionData = Omit<Transaction, 'id' | 'date'>;
 export interface Goal {
   id: string;
   name: string;
-  currentAmount: number;
   targetAmount: number;
+  currentAmount: number;
+  category: string | null;
+  deadline: string | null;
+}
+
+export interface NewGoalData {
+  name: string;
+  targetAmount: number;
+  category?: string;
+  deadline?: string;
+}
+
+export interface NewContributionData {
+  amount: number;
+  date?: string;
+  note?: string;
 }

@@ -53,7 +53,8 @@
     "noTransactions": "Nenhuma transação encontrada.",
     "categoryChartTitle": "Gastos por Categoria",
     "categoryChartPlaceholder": "Placeholder para o Gráfico",
-    "goalsTitle": "Metas"
+    "goalsTitle": "Metas",
+    "viewAll": "Ver todas"
   },
   "transactions": {
     "title": "Todas as Transações",
@@ -86,8 +87,33 @@
   },
   "goalsPage": {
     "title": "Minhas Metas",
-    "underConstruction": "Página de Metas em construção.",
-    "comingSoon": "Em breve você poderá cadastrar e acompanhar seus objetivos aqui!"
+    "newGoal": "Nova Meta",
+    "loading": "Carregando metas...",
+    "loadError": "Falha ao carregar metas.",
+    "empty": "Nenhuma meta cadastrada ainda.",
+    "emptyHint": "Crie sua primeira meta para começar a acompanhar seu progresso!",
+    "confirmDelete": "Tem certeza que deseja excluir esta meta?"
+  },
+  "goalModal": {
+    "newTitle": "Nova Meta",
+    "editTitle": "Editar Meta",
+    "nameLabel": "Nome da meta",
+    "namePlaceholder": "Ex: Viagem dos sonhos",
+    "targetLabel": "Valor alvo (R$)",
+    "targetPlaceholder": "0.00",
+    "categoryLabel": "Categoria vinculada (opcional)",
+    "categoryPlaceholder": "Ex: Viagem",
+    "categoryHint": "Receitas nesta categoria contam automaticamente para o progresso da meta.",
+    "deadlineLabel": "Prazo (opcional)",
+    "validationError": "Preencha o nome e um valor alvo positivo.",
+    "saving": "Salvando...",
+    "save": "Salvar Meta"
+  },
+  "goalCard": {
+    "addContribution": "Adicionar contribuição",
+    "contributionPlaceholder": "Valor",
+    "confirm": "OK",
+    "cancel": "Cancelar"
   },
   "reportsPage": {
     "title": "Relatórios",

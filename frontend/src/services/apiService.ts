@@ -1,4 +1,11 @@
-import type { User, Transaction, NewTransactionData } from '../types';
+import type {
+  User,
+  Transaction,
+  NewTransactionData,
+  Goal,
+  NewGoalData,
+  NewContributionData,
+} from '../types';
 
 // ─── Configuração base ────────────────────────────────────────────────────────
 
@@ -140,6 +147,54 @@ export const apiService = {
    */
   deleteTransaction: async (id: string): Promise<void> => {
     await apiFetch(`/transactions/${id}`, { method: 'DELETE' });
+  },
+
+  /**
+   * GET /api/goals
+   */
+  getGoals: async (): Promise<Goal[]> => {
+    const response = await apiFetch('/goals');
+    return response.json() as Promise<Goal[]>;
+  },
+
+  /**
+   * POST /api/goals
+   */
+  createGoal: async (data: NewGoalData): Promise<Goal> => {
+    const response = await apiFetch('/goals', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.json() as Promise<Goal>;
+  },
+
+  /**
+   * PATCH /api/goals/:id
+   */
+  updateGoal: async (id: string, data: NewGoalData): Promise<Goal> => {
+    const response = await apiFetch(`/goals/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return response.json() as Promise<Goal>;
+  },
+
+  /**
+   * DELETE /api/goals/:id
+   */
+  deleteGoal: async (id: string): Promise<void> => {
+    await apiFetch(`/goals/${id}`, { method: 'DELETE' });
+  },
+
+  /**
+   * POST /api/goals/:id/contributions
+   */
+  addContribution: async (id: string, data: NewContributionData): Promise<Goal> => {
+    const response = await apiFetch(`/goals/${id}/contributions`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.json() as Promise<Goal>;
   },
 
   checkAuthStatus,
