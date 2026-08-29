@@ -1,38 +1,38 @@
 # Finly backend (NestJS + TypeORM)
 
-## Como inicializar via Docker (recomendado)
+## How to run via Docker (recommended)
 
-O `docker-compose.yml` fica na raiz do repositório, não aqui (sobe backend + banco juntos).
+The `docker-compose.yml` lives at the repo root, not here (it brings up the backend + database together).
 
 ```bash
-cp ../.env.example ../.env   # preencha DB_PASSWORD, JWT_SECRET e GRAFANA_ADMIN_PASSWORD
+cp ../.env.example ../.env   # fill in DB_PASSWORD, JWT_SECRET, and GRAFANA_ADMIN_PASSWORD
 cd ..
-docker compose up --build    # primeira vez / após mudanças no Dockerfile
-docker compose up -d         # subsequentes, em segundo plano
+docker compose up --build    # first run / after Dockerfile changes
+docker compose up -d         # subsequent runs, in the background
 ```
 
-As migrations do TypeORM rodam automaticamente (`migrationsRun: true`) assim que o container do backend sobe — não há mais um passo manual de `db:init`.
+TypeORM migrations run automatically (`migrationsRun: true`) as soon as the backend container starts — there's no more manual `db:init` step.
 
-Isso sobe: Postgres, o backend em `http://localhost:3001`, o frontend em `http://localhost:3000` (Nginx servindo o build de produção, com `/api` já proxiado para o backend — é essa URL que você acessa no navegador, não a `:3001`), Prometheus em `http://localhost:9090` (raspando `/api/metrics` a cada 15s) e Grafana em `http://localhost:3300` (login `admin`/`GRAFANA_ADMIN_PASSWORD`, já com o datasource do Prometheus e um dashboard "Finly Backend" provisionados — ver `infra/prometheus/` e `infra/grafana/`).
+This brings up: Postgres, the backend at `http://localhost:3001`, the frontend at `http://localhost:3000` (Nginx serving the production build, with `/api` already proxied to the backend — that's the URL you open in the browser, not `:3001`), Prometheus at `http://localhost:9090` (scraping `/api/metrics` every 15s), and Grafana at `http://localhost:3300` (log in with `admin`/`GRAFANA_ADMIN_PASSWORD`, with the Prometheus datasource and a "Finly Backend" dashboard already provisioned — see `infra/prometheus/` and `infra/grafana/`).
 
-## Desenvolvimento local (sem Docker)
+## Local development (without Docker)
 
 ```bash
 npm install
-npm run start:dev      # watch mode, lê variáveis de backend/.env
+npm run start:dev      # watch mode, reads variables from backend/.env
 ```
 
-## Testes
+## Tests
 
 ```bash
-npm run test           # unit tests (Vitest, sem dependências externas)
-npm run test:e2e       # e2e (Supertest) — precisa de um Postgres real com as migrations aplicadas
+npm run test           # unit tests (Vitest, no external dependencies)
+npm run test:e2e       # e2e (Supertest) — needs a real Postgres with migrations applied
 ```
 
 ## Migrations
 
 ```bash
-npm run migration:generate   # gera uma migration a partir de mudanças nas entities
-npm run migration:run        # aplica migrations pendentes manualmente (fora do Docker)
-npm run migration:revert     # desfaz a última migration
+npm run migration:generate   # generate a migration from entity changes
+npm run migration:run        # apply pending migrations manually (outside Docker)
+npm run migration:revert     # revert the last migration
 ```
