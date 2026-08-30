@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import type { Goal, NewGoalData } from '../types';
 import { labelClass, primaryButtonClass, textInputClass } from '../styles/formStyles';
+import { useCategories } from '../hooks/useCategories';
 
 interface GoalFormModalProps {
   isOpen: boolean;
@@ -13,24 +14,31 @@ interface GoalFormModalProps {
 
 const GoalFormModal: React.FC<GoalFormModalProps> = ({ isOpen, onClose, onSave, goalToEdit }) => {
   const { t } = useTranslation();
+  const { data: categories = [] } = useCategories();
   const [name, setName] = useState('');
   const [targetAmount, setTargetAmount] = useState<number | ''>('');
-  const [category, setCategory] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const [deadline, setDeadline] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Linked income transactions count toward a goal, so only income/both categories qualify.
+  const linkableCategories = useMemo(
+    () => categories.filter((c) => c.type === 'income' || c.type === 'both'),
+    [categories],
+  );
 
   useEffect(() => {
     if (isOpen) {
       if (goalToEdit) {
         setName(goalToEdit.name);
         setTargetAmount(goalToEdit.targetAmount);
-        setCategory(goalToEdit.category ?? '');
+        setCategoryId(goalToEdit.category?.id ?? '');
         setDeadline(goalToEdit.deadline ?? '');
       } else {
         setName('');
         setTargetAmount('');
-        setCategory('');
+        setCategoryId('');
         setDeadline('');
       }
       setError('');
@@ -50,7 +58,7 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({ isOpen, onClose, onSave, 
     const data: NewGoalData = {
       name,
       targetAmount,
-      category: category.trim() || undefined,
+      categoryId: categoryId ? Number(categoryId) : null,
       deadline: deadline || undefined,
     };
 
@@ -108,14 +116,19 @@ const GoalFormModal: React.FC<GoalFormModalProps> = ({ isOpen, onClose, onSave, 
               <label htmlFor="goal-category" className={`${labelClass} mb-1`}>
                 {t('goalModal.categoryLabel')}
               </label>
-              <input
-                type="text"
+              <select
                 id="goal-category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder={t('goalModal.categoryPlaceholder')}
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
                 className={textInputClass}
-              />
+              >
+                <option value="">{t('goalModal.categoryNone')}</option>
+                {linkableCategories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.emoji} {c.name}
+                  </option>
+                ))}
+              </select>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('goalModal.categoryHint')}</p>
             </div>
 

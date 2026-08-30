@@ -4,6 +4,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { useDeleteTransaction, useTransactions } from '../hooks/useTransactions';
 import { useUiStore } from '../store/uiStore';
 import type { Transaction } from '../types';
+import CategoryBadge from '../components/CategoryBadge';
 
 const TransactionsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -71,8 +72,8 @@ const TransactionsPage: React.FC = () => {
                 <div className="flex justify-between items-start gap-2">
                   <div className="min-w-0">
                     <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{tx.description}</p>
-                    <span className="mt-1 inline-block px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                      {tx.category}
+                    <span className="mt-1 inline-block">
+                      <CategoryBadge category={tx.category} />
                     </span>
                   </div>
                   <p className={`font-medium whitespace-nowrap ${tx.type === 'income' ? 'text-success-600 dark:text-success-500' : 'text-danger-600 dark:text-danger-500'}`}>
@@ -115,9 +116,7 @@ const TransactionsPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                        {tx.category}
-                      </span>
+                      <CategoryBadge category={tx.category} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500 dark:text-gray-400">{new Date(tx.date).toLocaleDateString()}</div>

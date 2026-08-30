@@ -4,6 +4,7 @@ import { Pencil, PlusCircle, Trash2 } from 'lucide-react';
 import type { Goal } from '../types';
 import { useAddContribution } from '../hooks/useGoals';
 import { textInputClass } from '../styles/formStyles';
+import CategoryBadge from './CategoryBadge';
 
 interface GoalCardProps {
   goal: Goal;
@@ -36,11 +37,7 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onDelete }) => {
         <div className="min-w-0">
           <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{goal.name}</h4>
           <div className="mt-1 flex flex-wrap gap-2">
-            {goal.category && (
-              <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary-50 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300">
-                {goal.category}
-              </span>
-            )}
+            {goal.category && <CategoryBadge category={goal.category} />}
             {goal.deadline && (
               <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
                 {new Date(goal.deadline).toLocaleDateString()}

@@ -17,7 +17,7 @@ const goal: Goal = {
   name: 'Dream trip',
   targetAmount: 2000,
   currentAmount: 450,
-  category: 'Travel',
+  category: { id: '7', name: 'Travel', emoji: '✈️', color: '#3b82f6', type: 'both' },
   deadline: null,
 };
 

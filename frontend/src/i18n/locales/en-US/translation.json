@@ -4,21 +4,28 @@
     "edit": "Edit",
     "delete": "Delete",
     "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "saved": "Changes saved.",
     "confirmDeleteTransaction": "Are you sure you want to delete this transaction?"
   },
   "sidebar": {
     "newTransaction": "New Transaction",
     "dashboard": "Dashboard",
     "transactions": "Transactions",
+    "categories": "Categories",
     "goals": "Goals",
     "reports": "Reports",
     "admin": "Admin",
+    "settings": "Settings",
     "roleUser": "User",
     "roleAdmin": "Administrator",
     "logout": "Log out",
     "toggleTheme": "Toggle theme",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "openSettings": "Open settings"
   },
   "auth": {
     "login": {
@@ -48,6 +55,7 @@
     }
   },
   "dashboard": {
+    "greeting": "Welcome back, {{name}}",
     "income": "Income",
     "expenses": "Expenses",
     "balance": "Balance",
@@ -55,7 +63,8 @@
     "loadingTransactions": "Loading transactions...",
     "noTransactions": "No transactions found.",
     "categoryChartTitle": "Spending by Category",
-    "categoryChartPlaceholder": "Chart placeholder",
+    "categoryChartSubtitle": "This month's expenses",
+    "categoryChartEmpty": "No expenses recorded this month.",
     "goalsTitle": "Goals",
     "viewAll": "View all"
   },
@@ -82,11 +91,42 @@
     "descriptionLabel": "Description",
     "descriptionPlaceholder": "e.g. Lunch, Salary",
     "categoryLabel": "Category",
-    "categoryPlaceholder": "e.g. Food, Housing",
-    "validationError": "Please fill in all fields.",
+    "categoryNone": "— no category —",
+    "noCategoriesHint": "Create categories on the \"Categories\" tab to organize your transactions.",
+    "validationError": "Please fill in an amount and a description.",
     "saving": "Saving...",
     "saveChanges": "Save Changes",
     "saveNew": "Save Transaction"
+  },
+  "categories": {
+    "uncategorized": "Uncategorized"
+  },
+  "categoriesPage": {
+    "title": "Categories",
+    "newCategory": "New category",
+    "loading": "Loading categories...",
+    "loadError": "Failed to load categories.",
+    "empty": "No categories yet.",
+    "confirmDelete": "Delete this category?",
+    "confirmDeleteInUse_one": "{{count}} transaction uses this category and will become \"Uncategorized\". Continue?",
+    "confirmDeleteInUse_other": "{{count}} transactions use this category and will become \"Uncategorized\". Continue?"
+  },
+  "categoryModal": {
+    "newTitle": "New Category",
+    "editTitle": "Edit Category",
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. Food",
+    "emojiLabel": "Emoji",
+    "colorLabel": "Color",
+    "typeLabel": "Type",
+    "type": {
+      "expense": "Expense",
+      "income": "Income",
+      "both": "Both"
+    },
+    "validationError": "Provide a name, an emoji and a valid color (#RRGGBB).",
+    "saving": "Saving...",
+    "save": "Save Category"
   },
   "goalsPage": {
     "title": "My Goals",
@@ -105,7 +145,7 @@
     "targetLabel": "Target amount",
     "targetPlaceholder": "0.00",
     "categoryLabel": "Linked category (optional)",
-    "categoryPlaceholder": "e.g. Travel",
+    "categoryNone": "— none —",
     "categoryHint": "Income transactions in this category automatically count toward the goal's progress.",
     "deadlineLabel": "Deadline (optional)",
     "validationError": "Fill in a name and a positive target amount.",
@@ -133,6 +173,74 @@
     "exportCsv": "Export CSV",
     "exportPdf": "Export PDF",
     "exporting": "Exporting..."
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "profile": "Profile",
+      "work": "Work & Income",
+      "preferences": "Preferences",
+      "security": "Security"
+    },
+    "loading": "Loading...",
+    "profile": {
+      "avatar": "Profile photo",
+      "avatarHint": "PNG, JPEG or WebP, up to 5 MB.",
+      "upload": "Upload photo",
+      "remove": "Remove",
+      "displayName": "Display name",
+      "displayNamePlaceholder": "What should we call you?",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 (555) 123-4567",
+      "save": "Save profile",
+      "saved": "Profile updated.",
+      "emailSection": "Change email",
+      "newEmail": "New email",
+      "currentPassword": "Current password",
+      "currentPasswordHint": "Confirm your password to change your email.",
+      "changeEmail": "Change email",
+      "emailChanged": "Email changed."
+    },
+    "work": {
+      "intro": "This is stored on your profile and will power future features (savings rate, forecasting).",
+      "employmentStatus": "Employment status",
+      "status": {
+        "employed": "Employed",
+        "self_employed": "Self-employed",
+        "student": "Student",
+        "unemployed": "Unemployed",
+        "retired": "Retired",
+        "other": "Other"
+      },
+      "income": "Income",
+      "incomeFrequency": "Frequency",
+      "frequency": {
+        "monthly": "Monthly",
+        "biweekly": "Biweekly",
+        "weekly": "Weekly",
+        "annual": "Annual"
+      },
+      "payDay": "Pay day",
+      "payDayHint": "Day of the month your main income usually lands (1–31).",
+      "monthlyEquivalent": "Monthly equivalent: {{value}}",
+      "save": "Save",
+      "saved": "Details updated."
+    },
+    "preferences": {
+      "language": "Language",
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark"
+    },
+    "security": {
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "mismatch": "Passwords don't match.",
+      "tooShort": "The new password must be at least 6 characters.",
+      "save": "Change password",
+      "changed": "Password changed."
+    }
   },
   "adminPage": {
     "title": "Admin Panel",

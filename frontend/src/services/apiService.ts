@@ -2,11 +2,16 @@ import type {
   User,
   Transaction,
   NewTransactionData,
+  Category,
+  NewCategoryData,
   Goal,
   NewGoalData,
   NewContributionData,
   BalancePeriod,
   CategoryTotal,
+  UserProfile,
+  UpdateProfileData,
+  UpdateWorkData,
   AdminStats,
   AdminErrorLog,
 } from '../types';
@@ -18,13 +23,15 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 /**
  * Wrapper around fetch that:
  * - Injects the Authorization header automatically
+ * - Leaves Content-Type unset for FormData bodies (the browser adds the boundary)
  * - Throws a readable error when the response is not 2xx
  */
 const apiFetch = async (path: string, options: RequestInit = {}): Promise<Response> => {
   const token = localStorage.getItem('token');
+  const isFormData = options.body instanceof FormData;
 
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(options.headers as Record<string, string>),
   };
 
@@ -32,14 +39,9 @@ const apiFetch = async (path: string, options: RequestInit = {}): Promise<Respon
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  const response = await fetch(`${BASE_URL}${path}`, { ...options, headers });
 
-  // If the response is not 2xx, extract the backend's error message and throw
   if (!response.ok) {
-    // DELETE returns 204 with no body — handled before trying to parse
     if (response.status === 204) return response;
 
     const errorBody = await response.json().catch(() => ({ error: 'Unknown error.' }));
@@ -51,10 +53,6 @@ const apiFetch = async (path: string, options: RequestInit = {}): Promise<Respon
 
 // ─── Authentication services ─────────────────────────────────────────────────
 
-/**
- * Checks whether there's a valid token in localStorage and validates it with the backend.
- * Replaces the mock's checkAuthStatus.
- */
 const checkAuthStatus = async (): Promise<User | null> => {
   const token = localStorage.getItem('token');
   if (!token) return null;
@@ -64,15 +62,11 @@ const checkAuthStatus = async (): Promise<User | null> => {
     const data = await response.json();
     return data.user as User;
   } catch {
-    // Expired or invalid token — clear localStorage
     localStorage.removeItem('token');
     return null;
   }
 };
 
-/**
- * Removes the token from localStorage (the backend doesn't need to be notified).
- */
 const logout = async (): Promise<void> => {
   localStorage.removeItem('token');
 };
@@ -80,53 +74,34 @@ const logout = async (): Promise<void> => {
 // ─── apiService ───────────────────────────────────────────────────────────────
 
 export const apiService = {
-  /**
-   * POST /api/auth/login
-   */
   login: async (email: string, password: string): Promise<User> => {
     const response = await apiFetch('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
-
     const data = await response.json();
-
-    // Store the token for subsequent requests
     localStorage.setItem('token', data.token);
-
     return data.user as User;
   },
 
-  /**
-   * POST /api/auth/register
-   */
-  register: async (email: string, password: string): Promise<User> => {
+  register: async (email: string, password: string, locale?: string): Promise<User> => {
     const response = await apiFetch('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, locale }),
     });
-
     const data = await response.json();
-
-    // Log the user in automatically after registration
     localStorage.setItem('token', data.token);
-
     return data.user as User;
   },
 
-  /**
-   * GET /api/transactions
-   * Optionally filters by month: getTransactions('2025-11')
-   */
+  // ── Transactions ──────────────────────────────────────────────────────────
+
   getTransactions: async (month?: string): Promise<Transaction[]> => {
     const query = month ? `?month=${month}` : '';
     const response = await apiFetch(`/transactions${query}`);
     return response.json() as Promise<Transaction[]>;
   },
 
-  /**
-   * POST /api/transactions
-   */
   addTransaction: async (data: NewTransactionData): Promise<Transaction> => {
     const response = await apiFetch('/transactions', {
       method: 'POST',
@@ -135,9 +110,6 @@ export const apiService = {
     return response.json() as Promise<Transaction>;
   },
 
-  /**
-   * PUT /api/transactions/:id
-   */
   updateTransaction: async (id: string, data: NewTransactionData): Promise<Transaction> => {
     const response = await apiFetch(`/transactions/${id}`, {
       method: 'PUT',
@@ -146,24 +118,50 @@ export const apiService = {
     return response.json() as Promise<Transaction>;
   },
 
-  /**
-   * DELETE /api/transactions/:id
-   */
   deleteTransaction: async (id: string): Promise<void> => {
     await apiFetch(`/transactions/${id}`, { method: 'DELETE' });
   },
 
-  /**
-   * GET /api/goals
-   */
+  // ── Categories ────────────────────────────────────────────────────────────
+
+  getCategories: async (): Promise<Category[]> => {
+    const response = await apiFetch('/categories');
+    return response.json() as Promise<Category[]>;
+  },
+
+  createCategory: async (data: NewCategoryData): Promise<Category> => {
+    const response = await apiFetch('/categories', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.json() as Promise<Category>;
+  },
+
+  updateCategory: async (id: string, data: Partial<NewCategoryData>): Promise<Category> => {
+    const response = await apiFetch(`/categories/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return response.json() as Promise<Category>;
+  },
+
+  getCategoryUsage: async (id: string): Promise<number> => {
+    const response = await apiFetch(`/categories/${id}/usage`);
+    const data = await response.json();
+    return data.count as number;
+  },
+
+  deleteCategory: async (id: string): Promise<void> => {
+    await apiFetch(`/categories/${id}`, { method: 'DELETE' });
+  },
+
+  // ── Goals ─────────────────────────────────────────────────────────────────
+
   getGoals: async (): Promise<Goal[]> => {
     const response = await apiFetch('/goals');
     return response.json() as Promise<Goal[]>;
   },
 
-  /**
-   * POST /api/goals
-   */
   createGoal: async (data: NewGoalData): Promise<Goal> => {
     const response = await apiFetch('/goals', {
       method: 'POST',
@@ -172,9 +170,6 @@ export const apiService = {
     return response.json() as Promise<Goal>;
   },
 
-  /**
-   * PATCH /api/goals/:id
-   */
   updateGoal: async (id: string, data: NewGoalData): Promise<Goal> => {
     const response = await apiFetch(`/goals/${id}`, {
       method: 'PATCH',
@@ -183,16 +178,10 @@ export const apiService = {
     return response.json() as Promise<Goal>;
   },
 
-  /**
-   * DELETE /api/goals/:id
-   */
   deleteGoal: async (id: string): Promise<void> => {
     await apiFetch(`/goals/${id}`, { method: 'DELETE' });
   },
 
-  /**
-   * POST /api/goals/:id/contributions
-   */
   addContribution: async (id: string, data: NewContributionData): Promise<Goal> => {
     const response = await apiFetch(`/goals/${id}/contributions`, {
       method: 'POST',
@@ -201,9 +190,64 @@ export const apiService = {
     return response.json() as Promise<Goal>;
   },
 
-  /**
-   * GET /api/reports/balance
-   */
+  // ── Profile / Settings ────────────────────────────────────────────────────
+
+  getProfile: async (): Promise<UserProfile> => {
+    const response = await apiFetch('/users/me/profile');
+    return response.json() as Promise<UserProfile>;
+  },
+
+  updateProfile: async (data: UpdateProfileData): Promise<UserProfile> => {
+    const response = await apiFetch('/users/me/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return response.json() as Promise<UserProfile>;
+  },
+
+  updateWork: async (data: UpdateWorkData): Promise<UserProfile> => {
+    const response = await apiFetch('/users/me/work', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return response.json() as Promise<UserProfile>;
+  },
+
+  changeEmail: async (newEmail: string, currentPassword: string): Promise<User> => {
+    const response = await apiFetch('/users/me/email', {
+      method: 'PATCH',
+      body: JSON.stringify({ newEmail, currentPassword }),
+    });
+    const data = await response.json();
+    localStorage.setItem('token', data.token);
+    return data.user as User;
+  },
+
+  changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
+    await apiFetch('/users/me/password', {
+      method: 'PATCH',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+
+  uploadAvatar: async (file: File): Promise<UserProfile> => {
+    const body = new FormData();
+    body.append('file', file);
+    const response = await apiFetch('/users/me/avatar', { method: 'POST', body });
+    return response.json() as Promise<UserProfile>;
+  },
+
+  getAvatarBlob: async (): Promise<Blob> => {
+    const response = await apiFetch('/users/me/avatar');
+    return response.blob();
+  },
+
+  deleteAvatar: async (): Promise<void> => {
+    await apiFetch('/users/me/avatar', { method: 'DELETE' });
+  },
+
+  // ── Reports ───────────────────────────────────────────────────────────────
+
   getBalanceReport: async (from?: string, to?: string): Promise<BalancePeriod[]> => {
     const params = new URLSearchParams();
     if (from) params.set('from', from);
@@ -213,9 +257,6 @@ export const apiService = {
     return response.json() as Promise<BalancePeriod[]>;
   },
 
-  /**
-   * GET /api/reports/by-category
-   */
   getCategoryReport: async (
     type: 'income' | 'expense',
     from?: string,
@@ -228,19 +269,12 @@ export const apiService = {
     return response.json() as Promise<CategoryTotal[]>;
   },
 
-  /**
-   * GET /api/reports/month-over-month
-   */
   getMonthOverMonth: async (months?: number): Promise<BalancePeriod[]> => {
     const query = months ? `?months=${months}` : '';
     const response = await apiFetch(`/reports/month-over-month${query}`);
     return response.json() as Promise<BalancePeriod[]>;
   },
 
-  /**
-   * GET /api/reports/export
-   * Returns the raw file (CSV/PDF) for download.
-   */
   exportReport: async (format: 'csv' | 'pdf', from?: string, to?: string): Promise<Blob> => {
     const params = new URLSearchParams({ format });
     if (from) params.set('from', from);
@@ -249,9 +283,8 @@ export const apiService = {
     return response.blob();
   },
 
-  /**
-   * GET /api/admin/stats
-   */
+  // ── Admin ─────────────────────────────────────────────────────────────────
+
   getAdminStats: async (from?: string, to?: string): Promise<AdminStats> => {
     const params = new URLSearchParams();
     if (from) params.set('from', from);
@@ -261,9 +294,6 @@ export const apiService = {
     return response.json() as Promise<AdminStats>;
   },
 
-  /**
-   * GET /api/admin/errors
-   */
   getAdminErrors: async (limit?: number): Promise<AdminErrorLog[]> => {
     const query = limit ? `?limit=${limit}` : '';
     const response = await apiFetch(`/admin/errors${query}`);

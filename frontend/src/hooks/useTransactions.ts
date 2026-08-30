@@ -4,12 +4,13 @@ import type { NewTransactionData } from '../types';
 
 const transactionsKey = (month?: string) => ['transactions', month] as const;
 
-// Goal progress is computed server-side from transactions (via the
-// category link), so any transaction mutation can change a goal's
-// currentAmount — invalidate both caches together.
+// Goal progress and the reports aggregates are both computed server-side
+// from transactions, so any transaction mutation can change a goal's
+// currentAmount or a report total — invalidate all three caches together.
 function invalidateTransactionsAndGoals(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: ['transactions'] });
   queryClient.invalidateQueries({ queryKey: ['goals'] });
+  queryClient.invalidateQueries({ queryKey: ['reports'] });
 }
 
 export function useTransactions(month?: string) {

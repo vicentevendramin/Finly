@@ -1,12 +1,11 @@
 import React from 'react';
 import { NavLink as RouterNavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, List, Target, BarChart2, Plus, LogOut, ShieldCheck } from 'lucide-react';
+import { Home, List, Tags, Target, BarChart2, Plus, LogOut, ShieldCheck, Settings } from 'lucide-react';
 import { apiService } from '../services/apiService';
 import { useAuthStore } from '../store/authStore';
 import { useUiStore } from '../store/uiStore';
-import LanguageSwitcher from './LanguageSwitcher';
-import ThemeToggle from './ThemeToggle';
+import Avatar from './Avatar';
 
 const SidebarNavItem: React.FC<{
   to: string;
@@ -75,9 +74,7 @@ const Sidebar: React.FC = () => {
       >
         {/* Logo / Title */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h1 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-            Finly
-          </h1>
+          <h1 className="text-2xl font-bold text-primary-600 dark:text-primary-400">Finly</h1>
         </div>
 
         {/* New Transaction button */}
@@ -92,35 +89,36 @@ const Sidebar: React.FC = () => {
         </div>
 
         {/* Main navigation */}
-        <nav className="flex-1 px-6 space-y-2">
+        <nav className="flex-1 px-6 space-y-2 overflow-y-auto">
           <SidebarNavItem to="/app/dashboard" icon={Home} label={t('sidebar.dashboard')} onNavigate={closeMobileMenu} />
           <SidebarNavItem to="/app/transactions" icon={List} label={t('sidebar.transactions')} onNavigate={closeMobileMenu} />
+          <SidebarNavItem to="/app/categories" icon={Tags} label={t('sidebar.categories')} onNavigate={closeMobileMenu} />
           <SidebarNavItem to="/app/goals" icon={Target} label={t('sidebar.goals')} onNavigate={closeMobileMenu} />
           <SidebarNavItem to="/app/reports" icon={BarChart2} label={t('sidebar.reports')} onNavigate={closeMobileMenu} />
+          <SidebarNavItem to="/app/settings" icon={Settings} label={t('sidebar.settings')} onNavigate={closeMobileMenu} />
           {user.role === 'admin' && (
             <SidebarNavItem to="/app/admin" icon={ShieldCheck} label={t('sidebar.admin')} onNavigate={closeMobileMenu} />
           )}
         </nav>
 
         {/* Profile / Logout */}
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 mt-auto space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <LanguageSwitcher />
-            <ThemeToggle />
-          </div>
-          <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center font-bold text-gray-600 dark:text-gray-200 mr-3">
-              {user.email[0].toUpperCase()}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-800 dark:text-gray-100" title={user.email}>
-                {user.email.length > 20 ? `${user.email.substring(0, 17)}...` : user.email}
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700 mt-auto space-y-3">
+          <RouterNavLink
+            to="/app/settings"
+            onClick={closeMobileMenu}
+            className="flex items-center gap-3 p-2 -m-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            title={t('sidebar.openSettings')}
+          >
+            <Avatar size={40} />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
+                {user.displayName || user.email}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {user.role === 'admin' ? t('sidebar.roleAdmin') : t('sidebar.roleUser')}
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {user.displayName ? user.email : user.role === 'admin' ? t('sidebar.roleAdmin') : t('sidebar.roleUser')}
               </p>
             </div>
-          </div>
+          </RouterNavLink>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700 py-2 rounded-lg transition-colors"

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { NewTransactionData, Transaction } from '../types';
 import { X } from 'lucide-react';
 import { labelClass, primaryButtonClass, textInputClass } from '../styles/formStyles';
+import { useCategories } from '../hooks/useCategories';
 
 interface ModalProps {
   isOpen: boolean;
@@ -13,38 +14,51 @@ interface ModalProps {
 
 const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transactionToEdit }) => {
   const { t } = useTranslation();
-  // Form state
+  const { data: categories = [] } = useCategories();
+
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState<number | ''>('');
   const [type, setType] = useState<'income' | 'expense'>('expense');
-  const [category, setCategory] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Effect to fill the form when 'transactionToEdit' changes
+  const availableCategories = useMemo(
+    () => categories.filter((c) => c.type === type || c.type === 'both'),
+    [categories, type],
+  );
+
   useEffect(() => {
-    if (isOpen) {
-      if (transactionToEdit) {
-        // Edit mode: fill the form
-        setDescription(transactionToEdit.description);
-        setAmount(Math.abs(transactionToEdit.amount)); // Always use a positive value in the input
-        setType(transactionToEdit.type);
-        setCategory(transactionToEdit.category);
-      } else {
-        // Clear the form
-        setDescription('');
-        setAmount('');
-        setType('expense');
-        setCategory('');
-      }
-      setError('');
-      setIsLoading(false);
+    if (!isOpen) return;
+    if (transactionToEdit) {
+      setDescription(transactionToEdit.description);
+      setAmount(Math.abs(transactionToEdit.amount));
+      setType(transactionToEdit.type);
+      setCategoryId(transactionToEdit.category?.id ?? '');
+    } else {
+      setDescription('');
+      setAmount('');
+      setType('expense');
+      setCategoryId('');
     }
-  }, [isOpen, transactionToEdit]); // Runs whenever the modal opens or the transaction changes
+    setError('');
+    setIsLoading(false);
+  }, [isOpen, transactionToEdit]);
+
+  // Once categories have loaded, drop a selection that no longer fits the chosen type.
+  useEffect(() => {
+    if (
+      categoryId &&
+      categories.length > 0 &&
+      !availableCategories.some((c) => c.id === categoryId)
+    ) {
+      setCategoryId('');
+    }
+  }, [categories.length, availableCategories, categoryId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description || amount === '' || amount === 0 || !category) {
+    if (!description || amount === '' || amount === 0) {
       setError(t('transactionModal.validationError'));
       return;
     }
@@ -53,22 +67,17 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
 
     const data: NewTransactionData = {
       description,
-      amount: Math.abs(amount), // API always receives a positive value
+      amount: Math.abs(amount),
       type,
-      category,
+      categoryId: categoryId ? Number(categoryId) : null,
     };
 
-    // onSave (from App.tsx) now knows whether it's editing or saving
     await onSave(data);
-
-    // App.tsx is now responsible for closing the modal
-    // (onSave already calls handleCloseModal)
     setIsLoading(false);
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    // Allow only digits and a single decimal point
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       setAmount(val === '' ? '' : Number(val));
     }
@@ -79,13 +88,9 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
   }
 
   return (
-    // Backdrop
     <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
-      {/* Modal content */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg z-50">
-        {/* Modal header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
-          {/* Dynamic title */}
           <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
             {transactionToEdit ? t('transactionModal.editTitle') : t('transactionModal.newTitle')}
           </h3>
@@ -98,10 +103,8 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
-            {/* Type (Income/Expense) */}
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
@@ -127,13 +130,12 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
               </button>
             </div>
 
-            {/* Amount */}
             <div>
               <label htmlFor="amount" className={`${labelClass} mb-1`}>
                 {t('transactionModal.amountLabel')}
               </label>
               <input
-                type="text" // Use 'text' to control the format
+                type="text"
                 id="amount"
                 value={amount}
                 onChange={handleAmountChange}
@@ -142,7 +144,6 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
               />
             </div>
 
-            {/* Description */}
             <div>
               <label htmlFor="description" className={`${labelClass} mb-1`}>
                 {t('transactionModal.descriptionLabel')}
@@ -157,26 +158,33 @@ const NewTransactionModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, tr
               />
             </div>
 
-            {/* Category */}
             <div>
               <label htmlFor="category" className={`${labelClass} mb-1`}>
                 {t('transactionModal.categoryLabel')}
               </label>
-              <input
-                type="text"
+              <select
                 id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder={t('transactionModal.categoryPlaceholder')}
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
                 className={textInputClass}
-              />
-              {/* TODO: Replace with a <select> of predefined categories */}
+              >
+                <option value="">{t('transactionModal.categoryNone')}</option>
+                {availableCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.emoji} {category.name}
+                  </option>
+                ))}
+              </select>
+              {categories.length === 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {t('transactionModal.noCategoriesHint')}
+                </p>
+              )}
             </div>
 
             {error && <p className="text-danger-500 text-sm">{error}</p>}
           </div>
 
-          {/* Save button */}
           <div className="mt-8">
             <button type="submit" disabled={isLoading} className={primaryButtonClass}>
               {isLoading

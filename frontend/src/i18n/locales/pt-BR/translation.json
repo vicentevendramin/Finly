@@ -4,21 +4,28 @@
     "edit": "Editar",
     "delete": "Excluir",
     "close": "Fechar",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "saving": "Salvando...",
+    "saved": "Alterações salvas.",
     "confirmDeleteTransaction": "Tem certeza que deseja excluir esta transação?"
   },
   "sidebar": {
     "newTransaction": "Nova Transação",
     "dashboard": "Dashboard",
     "transactions": "Transações",
+    "categories": "Categorias",
     "goals": "Metas",
     "reports": "Relatórios",
     "admin": "Admin",
+    "settings": "Configurações",
     "roleUser": "Usuário",
     "roleAdmin": "Administrador",
     "logout": "Sair",
     "toggleTheme": "Alternar tema",
     "openMenu": "Abrir menu",
-    "closeMenu": "Fechar menu"
+    "closeMenu": "Fechar menu",
+    "openSettings": "Abrir configurações"
   },
   "auth": {
     "login": {
@@ -48,6 +55,7 @@
     }
   },
   "dashboard": {
+    "greeting": "Bem-vindo(a) de volta, {{name}}",
     "income": "Receitas",
     "expenses": "Despesas",
     "balance": "Saldo",
@@ -55,7 +63,8 @@
     "loadingTransactions": "Carregando transações...",
     "noTransactions": "Nenhuma transação encontrada.",
     "categoryChartTitle": "Gastos por Categoria",
-    "categoryChartPlaceholder": "Placeholder para o Gráfico",
+    "categoryChartSubtitle": "Despesas do mês atual",
+    "categoryChartEmpty": "Nenhuma despesa registrada neste mês.",
     "goalsTitle": "Metas",
     "viewAll": "Ver todas"
   },
@@ -82,11 +91,42 @@
     "descriptionLabel": "Descrição",
     "descriptionPlaceholder": "Ex: Almoço, Salário",
     "categoryLabel": "Categoria",
-    "categoryPlaceholder": "Ex: Alimentação, Moradia",
-    "validationError": "Por favor, preencha todos os campos.",
+    "categoryNone": "— sem categoria —",
+    "noCategoriesHint": "Crie categorias na aba \"Categorias\" para organizar suas transações.",
+    "validationError": "Por favor, preencha valor e descrição.",
     "saving": "Salvando...",
     "saveChanges": "Salvar Alterações",
     "saveNew": "Salvar Transação"
+  },
+  "categories": {
+    "uncategorized": "Sem categoria"
+  },
+  "categoriesPage": {
+    "title": "Categorias",
+    "newCategory": "Nova categoria",
+    "loading": "Carregando categorias...",
+    "loadError": "Falha ao carregar categorias.",
+    "empty": "Nenhuma categoria cadastrada ainda.",
+    "confirmDelete": "Excluir esta categoria?",
+    "confirmDeleteInUse_one": "{{count}} transação usa esta categoria e ficará \"Sem categoria\". Continuar?",
+    "confirmDeleteInUse_other": "{{count}} transações usam esta categoria e ficarão \"Sem categoria\". Continuar?"
+  },
+  "categoryModal": {
+    "newTitle": "Nova Categoria",
+    "editTitle": "Editar Categoria",
+    "nameLabel": "Nome",
+    "namePlaceholder": "Ex: Alimentação",
+    "emojiLabel": "Emoji",
+    "colorLabel": "Cor",
+    "typeLabel": "Tipo",
+    "type": {
+      "expense": "Despesa",
+      "income": "Receita",
+      "both": "Ambos"
+    },
+    "validationError": "Informe um nome, um emoji e uma cor válida (#RRGGBB).",
+    "saving": "Salvando...",
+    "save": "Salvar Categoria"
   },
   "goalsPage": {
     "title": "Minhas Metas",
@@ -105,7 +145,7 @@
     "targetLabel": "Valor alvo (R$)",
     "targetPlaceholder": "0.00",
     "categoryLabel": "Categoria vinculada (opcional)",
-    "categoryPlaceholder": "Ex: Viagem",
+    "categoryNone": "— nenhuma —",
     "categoryHint": "Receitas nesta categoria contam automaticamente para o progresso da meta.",
     "deadlineLabel": "Prazo (opcional)",
     "validationError": "Preencha o nome e um valor alvo positivo.",
@@ -133,6 +173,74 @@
     "exportCsv": "Exportar CSV",
     "exportPdf": "Exportar PDF",
     "exporting": "Exportando..."
+  },
+  "settings": {
+    "title": "Configurações",
+    "tabs": {
+      "profile": "Perfil",
+      "work": "Trabalho e Renda",
+      "preferences": "Preferências",
+      "security": "Segurança"
+    },
+    "loading": "Carregando...",
+    "profile": {
+      "avatar": "Foto de perfil",
+      "avatarHint": "PNG, JPEG ou WebP, até 5 MB.",
+      "upload": "Enviar foto",
+      "remove": "Remover",
+      "displayName": "Nome de exibição",
+      "displayNamePlaceholder": "Como devemos te chamar?",
+      "phone": "Telefone",
+      "phonePlaceholder": "+55 (11) 99999-0000",
+      "save": "Salvar perfil",
+      "saved": "Perfil atualizado.",
+      "emailSection": "Alterar e-mail",
+      "newEmail": "Novo e-mail",
+      "currentPassword": "Senha atual",
+      "currentPasswordHint": "Confirme sua senha para alterar o e-mail.",
+      "changeEmail": "Alterar e-mail",
+      "emailChanged": "E-mail alterado."
+    },
+    "work": {
+      "intro": "Esses dados ficam guardados no seu perfil e serão usados em recursos futuros (taxa de poupança, previsões).",
+      "employmentStatus": "Situação profissional",
+      "status": {
+        "employed": "Empregado(a) (CLT)",
+        "self_employed": "Autônomo(a) / PJ",
+        "student": "Estudante",
+        "unemployed": "Desempregado(a)",
+        "retired": "Aposentado(a)",
+        "other": "Outro"
+      },
+      "income": "Renda",
+      "incomeFrequency": "Frequência",
+      "frequency": {
+        "monthly": "Mensal",
+        "biweekly": "Quinzenal",
+        "weekly": "Semanal",
+        "annual": "Anual"
+      },
+      "payDay": "Dia do pagamento",
+      "payDayHint": "Dia do mês em que a renda principal costuma cair (1–31).",
+      "monthlyEquivalent": "Equivalente mensal: {{value}}",
+      "save": "Salvar",
+      "saved": "Dados atualizados."
+    },
+    "preferences": {
+      "language": "Idioma",
+      "theme": "Tema",
+      "themeLight": "Claro",
+      "themeDark": "Escuro"
+    },
+    "security": {
+      "currentPassword": "Senha atual",
+      "newPassword": "Nova senha",
+      "confirmPassword": "Confirmar nova senha",
+      "mismatch": "As senhas não coincidem.",
+      "tooShort": "A nova senha deve ter pelo menos 6 caracteres.",
+      "save": "Alterar senha",
+      "changed": "Senha alterada."
+    }
   },
   "adminPage": {
     "title": "Painel de Administração",
