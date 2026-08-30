@@ -205,34 +205,34 @@ implements the dashboard "expenses by category" widget that was left as a placeh
 
 | # | Status | Task |
 |---|---|---|
-| U1 | ⬜ | `CategoriesModule` — entity, DTOs, `/api/categories` CRUD (guarded, user-scoped), service (ownership, case-insensitive uniqueness). Imports `AuthModule`. |
-| U2 | ⬜ | `SEED_CATEGORIES` per-locale map; `AuthService.register` takes optional `locale`, creates the `user_profiles` row + seed categories in one transaction after the user insert. |
-| U3 | ⬜ | `TransactionsService` — take `categoryId` (nullable, ownership-checked) on create/update; embed `category: {id,name,emoji,color,type}|null` in every response; update DTOs. |
-| U4 | ⬜ | `GoalsService.computeProgress` matches linked income by `tag_id`; goal responses embed the category object; DTOs take `categoryId`. |
-| U5 | ⬜ | `ReportsService.getCategoryBreakdown` — `GROUP BY tag_id` + join, return `{categoryId,name,color,emoji,total}` with a null→"Uncategorized" bucket; CSV/PDF emit the category name. |
-| U6 | ⬜ | Profile in `users/` — `UserProfile` entity, `ProfileService`, `ProfileController`: `GET`/`PATCH /users/me/profile`, `PATCH /users/me/email` (→ `{token}`), `PATCH /users/me/password`, `PATCH /users/me/work`. |
-| U7 | ⬜ | Avatar — `sharp` dep, `FileInterceptor` (5 MB, mime allowlist), `POST/GET/DELETE /users/me/avatar`; `GET` sends `Cache-Control` + `ETag` from `avatar_updated_at`. |
-| U8 | ⬜ | `AuthService` `register`/`login`/`me` responses add `displayName` + `avatarUpdatedAt`; update `AuthUser`. |
-| U9 | ⬜ | Re-squash `InitSchema` (regenerate vs a live DB, eyeball diff); sync `entities` arrays in `database.module.ts` + `data-source.ts`. |
-| U10 | ⬜ | Unit tests — CategoriesService, ProfileService (email/password/work/avatar w/ mocked sharp), updated Goals + Reports services. |
-| U11 | ⬜ | e2e — `categories.e2e-spec` (CRUD, 401, cross-user isolation, delete→tx.tag_id null), `profile.e2e-spec` (profile, email-change token + old/new login, password, avatar cycle, work); update transactions/goals/reports e2e for the FK. |
+| U1 | ✅ | `CategoriesModule` — entity, DTOs, `/api/categories` CRUD (guarded, user-scoped), service (ownership, case-insensitive uniqueness). Imports `AuthModule`. |
+| U2 | ✅ | `SEED_CATEGORIES` per-locale map; `AuthService.register` takes optional `locale`, creates the `user_profiles` row + seed categories in one transaction after the user insert. |
+| U3 | ✅ | `TransactionsService` — take `categoryId` (nullable, ownership-checked) on create/update; embed `category: {id,name,emoji,color,type}|null` in every response; update DTOs. |
+| U4 | ✅ | `GoalsService.computeProgress` matches linked income by `tag_id`; goal responses embed the category object; DTOs take `categoryId`. |
+| U5 | ✅ | `ReportsService.getCategoryBreakdown` — `GROUP BY tag_id` + join, return `{categoryId,name,color,emoji,total}` with a null→"Uncategorized" bucket; CSV/PDF emit the category name. |
+| U6 | ✅ | Profile in `users/` — `UserProfile` entity, `ProfileService`, `ProfileController`: `GET`/`PATCH /users/me/profile`, `PATCH /users/me/email` (→ `{token}`), `PATCH /users/me/password`, `PATCH /users/me/work`. |
+| U7 | ✅ | Avatar — `sharp` dep, `FileInterceptor` (5 MB, mime allowlist), `POST/GET/DELETE /users/me/avatar`; `GET` sends `Cache-Control` + `ETag` from `avatar_updated_at`. |
+| U8 | ✅ | `AuthService` `register`/`login`/`me` responses add `displayName` + `avatarUpdatedAt`; update `AuthUser`. |
+| U9 | ✅ | Re-squash `InitSchema` (regenerate vs a live DB, eyeball diff); sync `entities` arrays in `database.module.ts` + `data-source.ts`. |
+| U10 | ✅ | Unit tests — CategoriesService, ProfileService (email/password/work/avatar w/ mocked sharp), updated Goals + Reports services. |
+| U11 | ✅ | e2e — `categories.e2e-spec` (CRUD, 401, cross-user isolation, delete→tx.tag_id null), `profile.e2e-spec` (profile, email-change token + old/new login, password, avatar cycle, work); update transactions/goals/reports e2e for the FK. |
 
 ## Frontend task order
 
 | # | Status | Task |
 |---|---|---|
-| F1 | ⬜ | `types.ts` — `Category`; `Transaction.category`/`Goal.category` → object\|null (+ `categoryId` on write types); `CategoryTotal` reshape; `User.displayName?`; new `UserProfile`, `WorkIncome`. |
-| F2 | ⬜ | `apiService` — category CRUD; profile/email/password/work; avatar upload (teach `apiFetch` to skip the JSON `Content-Type` for `FormData`) / delete. |
-| F3 | ⬜ | `hooks/useCategories.ts` (mutations invalidate `['categories','transactions','goals','reports']`); `hooks/useProfile.ts` (email mutation swaps the `localStorage` token + `authStore`). |
-| F4 | ⬜ | `CategoriesPage` (`/app/categories`) + sidebar item — list (emoji/swatch/name/type), `CategoryFormModal` (lazy-loaded emoji-mart, color input, type radio), delete confirm showing the affected-transaction count. |
-| F5 | ⬜ | `NewTransactionModal` + `GoalFormModal` — `<select>` from `useCategories()` filtered by type + "— none —"; prefill by `categoryId`. |
-| F6 | ⬜ | `TransactionsPage` + dashboard recent list — render `emoji + name` w/ a colored dot; "Uncategorized" fallback. |
-| F7 | ⬜ | `DashboardCategoryChart` replaces the placeholder (current-month expenses grouped by category, colored bars + under-chart table); add a "Welcome back, {name}" greeting. |
-| F8 | ⬜ | `SettingsPage` (`/app/settings`) — tabbed: Profile / Work & Income / Preferences (move `LanguageSwitcher` + `ThemeToggle` here) / Security. |
-| F9 | ⬜ | `Sidebar` — drop the lang/theme controls from the footer; profile block becomes a `NavLink` to `/app/settings` with avatar + display name (email subtitle); add "Categories" + "Settings" nav items. |
-| F10 | ⬜ | `App.tsx` — routes for `/app/categories` + `/app/settings`. |
-| F11 | ⬜ | i18n — new `settings.*` + `categories.*` groups, `sidebar.categories/settings`, `dashboard.greeting`, drop `dashboard.categoryChartPlaceholder`; both `pt-BR` and `en-US`. |
-| F12 | ⬜ | Tests — `useCategories.spec`, `useProfile.spec` (token swap), `CategoryFormModal.spec`, `SettingsPage.spec`, `DashboardCategoryChart.spec`, updated `NewTransactionModal.spec`. |
+| F1 | ✅ | `types.ts` — `Category`; `Transaction.category`/`Goal.category` → object\|null (+ `categoryId` on write types); `CategoryTotal` reshape; `User.displayName?`; new `UserProfile`, `WorkIncome`. |
+| F2 | ✅ | `apiService` — category CRUD; profile/email/password/work; avatar upload (teach `apiFetch` to skip the JSON `Content-Type` for `FormData`) / delete. |
+| F3 | ✅ | `hooks/useCategories.ts` (mutations invalidate `['categories','transactions','goals','reports']`); `hooks/useProfile.ts` (email mutation swaps the `localStorage` token + `authStore`). |
+| F4 | ✅ | `CategoriesPage` (`/app/categories`) + sidebar item — list (emoji/swatch/name/type), `CategoryFormModal` (lazy-loaded emoji-mart, color input, type radio), delete confirm showing the affected-transaction count. |
+| F5 | ✅ | `NewTransactionModal` + `GoalFormModal` — `<select>` from `useCategories()` filtered by type + "— none —"; prefill by `categoryId`. |
+| F6 | ✅ | `TransactionsPage` + dashboard recent list — render `emoji + name` w/ a colored dot; "Uncategorized" fallback. |
+| F7 | ✅ | `DashboardCategoryChart` replaces the placeholder (current-month expenses grouped by category, colored bars + under-chart table); add a "Welcome back, {name}" greeting. |
+| F8 | ✅ | `SettingsPage` (`/app/settings`) — tabbed: Profile / Work & Income / Preferences (move `LanguageSwitcher` + `ThemeToggle` here) / Security. |
+| F9 | ✅ | `Sidebar` — drop the lang/theme controls from the footer; profile block becomes a `NavLink` to `/app/settings` with avatar + display name (email subtitle); add "Categories" + "Settings" nav items. |
+| F10 | ✅ | `App.tsx` — routes for `/app/categories` + `/app/settings`. |
+| F11 | ✅ | i18n — new `settings.*` + `categories.*` groups, `sidebar.categories/settings`, `dashboard.greeting`, drop `dashboard.categoryChartPlaceholder`; both `pt-BR` and `en-US`. |
+| F12 | ✅ | Tests — `useCategories.spec`, `useProfile.spec` (token swap), `CategoryFormModal.spec`, `SettingsPage.spec`, `DashboardCategoryChart.spec`, updated `NewTransactionModal.spec`. |
 
 ## Infra / docs
 
