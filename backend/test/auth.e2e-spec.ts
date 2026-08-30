@@ -24,7 +24,13 @@ describe('Auth (e2e)', () => {
       .expect(201);
 
     expect(res.body.token).toEqual(expect.any(String));
-    expect(res.body.user).toEqual({ id: expect.any(String), email, role: 'user' });
+    expect(res.body.user).toEqual({
+      id: expect.any(String),
+      email,
+      role: 'user',
+      displayName: null,
+      avatarUpdatedAt: null,
+    });
   });
 
   it('rejects registering the same email twice', async () => {

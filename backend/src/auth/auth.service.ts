@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service.js';
 import type { User, UserRole } from '../users/entities/user.entity.js';
+import { UserProfile } from '../users/entities/user-profile.entity.js';
 import { Category } from '../categories/entities/category.entity.js';
 import { seedCategoriesForUser } from '../categories/category-seeds.js';
 import type { RegisterDto } from './dto/register.dto.js';
@@ -19,6 +20,8 @@ export interface AuthUser {
   id: string;
   email: string;
   role: UserRole;
+  displayName: string | null;
+  avatarUpdatedAt: string | null;
 }
 
 export interface AuthResult {
@@ -33,6 +36,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(Category)
     private readonly categoriesRepository: Repository<Category>,
+    @InjectRepository(UserProfile)
+    private readonly profileRepository: Repository<UserProfile>,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResult> {
@@ -44,6 +49,9 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.password, 12);
     const user = await this.usersService.create(dto.email, passwordHash);
 
+    await this.profileRepository.save(
+      this.profileRepository.create({ userId: user.id }),
+    );
     await seedCategoriesForUser(this.categoriesRepository, user.id, dto.locale);
 
     return this.buildAuthResult(user);
@@ -68,19 +76,72 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found.');
     }
-    return { user: this.toAuthUser(user) };
+    return { user: await this.toAuthUser(user) };
   }
 
-  private buildAuthResult(user: User): AuthResult {
+  async changeEmail(
+    userId: number,
+    newEmail: string,
+    currentPassword: string,
+  ): Promise<AuthResult> {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+    const passwordMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Incorrect password.');
+    }
+
+    const normalized = newEmail.toLowerCase().trim();
+    if (normalized !== user.email) {
+      const clash = await this.usersService.findByEmail(normalized);
+      if (clash) {
+        throw new ConflictException('This email is already registered.');
+      }
+      await this.usersService.updateEmail(userId, normalized);
+    }
+
+    return this.buildAuthResult({ ...user, email: normalized });
+  }
+
+  async changePassword(
+    userId: number,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+    const passwordMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Incorrect password.');
+    }
+    await this.usersService.updatePassword(userId, await bcrypt.hash(newPassword, 12));
+  }
+
+  private async buildAuthResult(user: User): Promise<AuthResult> {
     const token = this.jwtService.sign({
       id: user.id,
       email: user.email,
       role: user.role,
     });
-    return { token, user: this.toAuthUser(user) };
+    return { token, user: await this.toAuthUser(user) };
   }
 
-  private toAuthUser(user: User): AuthUser {
-    return { id: String(user.id), email: user.email, role: user.role };
+  private async toAuthUser(user: User): Promise<AuthUser> {
+    const profile = await this.profileRepository.findOne({
+      where: { userId: user.id },
+    });
+    return {
+      id: String(user.id),
+      email: user.email,
+      role: user.role,
+      displayName: profile?.displayName ?? null,
+      avatarUpdatedAt: profile?.avatarUpdatedAt
+        ? profile.avatarUpdatedAt.toISOString()
+        : null,
+    };
   }
 }

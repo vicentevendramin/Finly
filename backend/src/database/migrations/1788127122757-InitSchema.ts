@@ -1,11 +1,14 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitSchema1788126655568 implements MigrationInterface {
-    name = 'InitSchema1788126655568'
+export class InitSchema1788127122757 implements MigrationInterface {
+    name = 'InitSchema1788127122757'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TYPE "public"."users_role_enum" AS ENUM('user', 'admin')`);
         await queryRunner.query(`CREATE TABLE "users" ("id" SERIAL NOT NULL, "email" character varying NOT NULL, "password_hash" character varying NOT NULL, "role" "public"."users_role_enum" NOT NULL DEFAULT 'user', "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_97672ac88f789774dd47f7c8be3" UNIQUE ("email"), CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."user_profiles_employment_status_enum" AS ENUM('employed', 'self_employed', 'student', 'unemployed', 'retired', 'other')`);
+        await queryRunner.query(`CREATE TYPE "public"."user_profiles_income_frequency_enum" AS ENUM('monthly', 'biweekly', 'weekly', 'annual')`);
+        await queryRunner.query(`CREATE TABLE "user_profiles" ("user_id" integer NOT NULL, "display_name" character varying(60), "phone" character varying(20), "avatar" bytea, "avatar_mime" character varying, "avatar_updated_at" TIMESTAMP WITH TIME ZONE, "employment_status" "public"."user_profiles_employment_status_enum", "income_amount" numeric(12,2), "income_frequency" "public"."user_profiles_income_frequency_enum", "pay_day" smallint, "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_6ca9503d77ae39b4b5a6cc3ba88" PRIMARY KEY ("user_id"))`);
         await queryRunner.query(`CREATE TYPE "public"."categories_type_enum" AS ENUM('income', 'expense', 'both')`);
         await queryRunner.query(`CREATE TABLE "categories" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, "emoji" character varying NOT NULL, "color" character varying NOT NULL, "type" "public"."categories_type_enum" NOT NULL DEFAULT 'both', "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "user_id" integer NOT NULL, CONSTRAINT "PK_24dbc6126a28ff948da33e97d3b" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "IDX_48f0690983e955b500b4a3e029" ON "categories" ("user_id", "name") `);
@@ -20,6 +23,7 @@ export class InitSchema1788126655568 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "goal_contributions" ("id" SERIAL NOT NULL, "amount" numeric(12,2) NOT NULL, "date" date NOT NULL, "note" character varying, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "goal_id" integer NOT NULL, CONSTRAINT "CHK_7b177bed6eac81f5bac2f06f44" CHECK ("amount" > 0), CONSTRAINT "PK_33413874ace4630a4451a4f4bda" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_a3486f892fb14eceb63fd37d49" ON "goal_contributions" ("goal_id") `);
         await queryRunner.query(`CREATE TABLE "error_logs" ("id" SERIAL NOT NULL, "message" character varying NOT NULL, "stack" text, "path" character varying NOT NULL, "user_id" integer, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_6840885d7eb78406fa7d358be72" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`ALTER TABLE "user_profiles" ADD CONSTRAINT "FK_6ca9503d77ae39b4b5a6cc3ba88" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "categories" ADD CONSTRAINT "FK_2296b7fe012d95646fa41921c8b" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "transactions" ADD CONSTRAINT "FK_e9acc6efa76de013e8c1553ed2b" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "transactions" ADD CONSTRAINT "FK_0634dad61fce88390efc093356f" FOREIGN KEY ("tag_id") REFERENCES "categories"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
@@ -35,6 +39,7 @@ export class InitSchema1788126655568 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "transactions" DROP CONSTRAINT "FK_0634dad61fce88390efc093356f"`);
         await queryRunner.query(`ALTER TABLE "transactions" DROP CONSTRAINT "FK_e9acc6efa76de013e8c1553ed2b"`);
         await queryRunner.query(`ALTER TABLE "categories" DROP CONSTRAINT "FK_2296b7fe012d95646fa41921c8b"`);
+        await queryRunner.query(`ALTER TABLE "user_profiles" DROP CONSTRAINT "FK_6ca9503d77ae39b4b5a6cc3ba88"`);
         await queryRunner.query(`DROP TABLE "error_logs"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_a3486f892fb14eceb63fd37d49"`);
         await queryRunner.query(`DROP TABLE "goal_contributions"`);
@@ -49,6 +54,9 @@ export class InitSchema1788126655568 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX "public"."IDX_48f0690983e955b500b4a3e029"`);
         await queryRunner.query(`DROP TABLE "categories"`);
         await queryRunner.query(`DROP TYPE "public"."categories_type_enum"`);
+        await queryRunner.query(`DROP TABLE "user_profiles"`);
+        await queryRunner.query(`DROP TYPE "public"."user_profiles_income_frequency_enum"`);
+        await queryRunner.query(`DROP TYPE "public"."user_profiles_employment_status_enum"`);
         await queryRunner.query(`DROP TABLE "users"`);
         await queryRunner.query(`DROP TYPE "public"."users_role_enum"`);
     }

@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import type { AppConfig } from '../config/configuration.js';
 import { User } from '../users/entities/user.entity.js';
+import { UserProfile } from '../users/entities/user-profile.entity.js';
 import { Transaction } from '../transactions/entities/transaction.entity.js';
 import { Category } from '../categories/entities/category.entity.js';
 import { Goal } from '../goals/entities/goal.entity.js';
@@ -21,7 +22,15 @@ import { ErrorLog } from '../common/entities/error-log.entity.js';
         database: configService.get('db.name', { infer: true }),
         username: configService.get('db.user', { infer: true }),
         password: configService.get('db.password', { infer: true }),
-        entities: [User, Transaction, Category, Goal, GoalContribution, ErrorLog],
+        entities: [
+          User,
+          UserProfile,
+          Transaction,
+          Category,
+          Goal,
+          GoalContribution,
+          ErrorLog,
+        ],
         synchronize: false,
         migrationsRun: true,
         migrations: ['dist/database/migrations/*.js'],
