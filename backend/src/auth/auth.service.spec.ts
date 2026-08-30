@@ -2,9 +2,11 @@ import { ConflictException, NotFoundException, UnauthorizedException } from '@ne
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Repository } from 'typeorm';
 import { AuthService } from './auth.service.js';
 import { UsersService } from '../users/users.service.js';
 import { UserRole, type User } from '../users/entities/user.entity.js';
+import type { Category } from '../categories/entities/category.entity.js';
 
 const buildUser = (overrides: Partial<User> = {}): User => ({
   id: 1,
@@ -18,6 +20,7 @@ const buildUser = (overrides: Partial<User> = {}): User => ({
 describe('AuthService', () => {
   let usersService: { findByEmail: ReturnType<typeof vi.fn>; findById: ReturnType<typeof vi.fn>; create: ReturnType<typeof vi.fn> };
   let jwtService: { sign: ReturnType<typeof vi.fn> };
+  let categoriesRepository: { create: ReturnType<typeof vi.fn>; save: ReturnType<typeof vi.fn> };
   let authService: AuthService;
 
   beforeEach(() => {
@@ -27,9 +30,14 @@ describe('AuthService', () => {
       create: vi.fn(),
     };
     jwtService = { sign: vi.fn().mockReturnValue('signed.jwt.token') };
+    categoriesRepository = {
+      create: vi.fn((v) => v),
+      save: vi.fn((v) => v),
+    };
     authService = new AuthService(
       usersService as unknown as UsersService,
       jwtService as unknown as JwtService,
+      categoriesRepository as unknown as Repository<Category>,
     );
   });
 
@@ -47,6 +55,7 @@ describe('AuthService', () => {
         'test@example.com',
         expect.any(String),
       );
+      expect(categoriesRepository.save).toHaveBeenCalled(); // starter categories seeded
       expect(result).toEqual({
         token: 'signed.jwt.token',
         user: { id: '1', email: 'test@example.com', role: UserRole.USER },

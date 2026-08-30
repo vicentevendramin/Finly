@@ -25,6 +25,8 @@ npm run test             # unit tests (Vitest, no external deps)
 npm run test -- src/transactions/transactions.service.spec.ts   # single unit-test file
 npm run test -- -t "computeProgress"                            # single test by name
 npm run test:e2e         # e2e tests (Supertest) — needs a real Postgres with migrations applied; rebuilds first, file parallelism disabled
+npm run lint             # oxlint src/ test/ (NOT eslint — that's the frontend)
+npm run format           # prettier --write over src/ + test/ (backend only has a formatter script)
 npm run migration:generate  # generate a migration from entity changes
 npm run migration:run       # apply pending migrations manually (outside Docker)
 ```
@@ -41,13 +43,14 @@ Brings up Postgres, the backend (`:3001`), Prometheus (`:9090`, scraping `backen
 ```bash
 npm run dev         # Vite dev server on port 3000
 npm run build       # tsc -b && vite build
-npm run lint        # eslint .
+npm run lint        # eslint . (NOT oxlint — that's the backend; frontend has no formatter script)
 npm run preview     # preview production build
 npm run test        # Vitest run (jsdom, Testing Library)
 npm run test:watch  # Vitest watch mode
 # single file:  npm run test -- src/hooks/useTransactions.spec.tsx
 # single test:  npm run test -- -t "invalidates the goals query"
 ```
+There is no `vitest.config.ts` on the frontend — test config lives in `vite.config.ts`'s `test` block. Specs are colocated with source: `services/apiService.spec.ts`, `hooks/useTransactions.spec.tsx`, `hooks/useGoals.spec.tsx`, `components/GoalCard.spec.tsx`, `components/NewTransactionModal.spec.tsx`, `routes/routeGuards.spec.tsx`.
 
 ## Architecture
 

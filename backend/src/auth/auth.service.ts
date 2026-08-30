@@ -5,9 +5,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service.js';
 import type { User, UserRole } from '../users/entities/user.entity.js';
+import { Category } from '../categories/entities/category.entity.js';
+import { seedCategoriesForUser } from '../categories/category-seeds.js';
 import type { RegisterDto } from './dto/register.dto.js';
 import type { LoginDto } from './dto/login.dto.js';
 
@@ -27,6 +31,8 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    @InjectRepository(Category)
+    private readonly categoriesRepository: Repository<Category>,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResult> {
@@ -37,6 +43,8 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
     const user = await this.usersService.create(dto.email, passwordHash);
+
+    await seedCategoriesForUser(this.categoriesRepository, user.id, dto.locale);
 
     return this.buildAuthResult(user);
   }
