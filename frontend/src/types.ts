@@ -1,8 +1,26 @@
+export type CategoryType = 'income' | 'expense' | 'both';
+
+export interface Category {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
+  type: CategoryType;
+}
+
+export interface NewCategoryData {
+  name: string;
+  emoji: string;
+  color: string;
+  type: CategoryType;
+}
+
 export interface User {
   id: string;
   email: string;
   role: 'user' | 'admin';
-  name?: string; // 'name' is kept optional, but the API doesn't send it
+  displayName?: string | null;
+  avatarUpdatedAt?: string | null;
 }
 
 export interface Transaction {
@@ -10,25 +28,30 @@ export interface Transaction {
   description: string;
   amount: number;
   date: string;
-  type: 'income' | 'expense'; 
-  category: string;
+  type: 'income' | 'expense';
+  category: Category | null;
 }
 
-export type NewTransactionData = Omit<Transaction, 'id' | 'date'>;
+export interface NewTransactionData {
+  description: string;
+  amount: number;
+  type: 'income' | 'expense';
+  categoryId?: number | null;
+}
 
 export interface Goal {
   id: string;
   name: string;
   targetAmount: number;
   currentAmount: number;
-  category: string | null;
+  category: Category | null;
   deadline: string | null;
 }
 
 export interface NewGoalData {
   name: string;
   targetAmount: number;
-  category?: string;
+  categoryId?: number | null;
   deadline?: string;
 }
 
@@ -45,14 +68,52 @@ export interface BalancePeriod {
   balance: number;
 }
 
+/** A row of the reports "by category" breakdown. `categoryId` is null for the "Uncategorized" bucket. */
 export interface CategoryTotal {
-  category: string;
+  categoryId: string | null;
+  name: string | null;
+  color: string | null;
+  emoji: string | null;
   total: number;
 }
 
 export interface ReportDateRange {
   from?: string;
   to?: string;
+}
+
+export type EmploymentStatus =
+  | 'employed'
+  | 'self_employed'
+  | 'student'
+  | 'unemployed'
+  | 'retired'
+  | 'other';
+
+export type IncomeFrequency = 'monthly' | 'biweekly' | 'weekly' | 'annual';
+
+export interface UserProfile {
+  displayName: string | null;
+  phone: string | null;
+  hasAvatar: boolean;
+  avatarUpdatedAt: string | null;
+  employmentStatus: EmploymentStatus | null;
+  incomeAmount: number | null;
+  incomeFrequency: IncomeFrequency | null;
+  payDay: number | null;
+  monthlyIncome: number | null;
+}
+
+export interface UpdateProfileData {
+  displayName?: string | null;
+  phone?: string | null;
+}
+
+export interface UpdateWorkData {
+  employmentStatus?: EmploymentStatus | null;
+  incomeAmount?: number | null;
+  incomeFrequency?: IncomeFrequency | null;
+  payDay?: number | null;
 }
 
 export interface AdminStats {

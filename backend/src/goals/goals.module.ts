@@ -4,12 +4,13 @@ import { AuthModule } from '../auth/auth.module.js';
 import { Goal } from './entities/goal.entity.js';
 import { GoalContribution } from './entities/goal-contribution.entity.js';
 import { Transaction } from '../transactions/entities/transaction.entity.js';
+import { Category } from '../categories/entities/category.entity.js';
 import { GoalsService } from './goals.service.js';
 import { GoalsController } from './goals.controller.js';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Goal, GoalContribution, Transaction]),
+    TypeOrmModule.forFeature([Goal, GoalContribution, Transaction, Category]),
     AuthModule,
   ],
   controllers: [GoalsController],

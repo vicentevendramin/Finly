@@ -12,6 +12,22 @@ async function registerAndLogin(app: INestApplication, email: string) {
   return res.body.token as string;
 }
 
+async function createCategory(
+  app: INestApplication,
+  token: string,
+  name: string,
+  type: 'income' | 'expense' | 'both' = 'both',
+) {
+  const res = await request(app.getHttpServer())
+    .post('/api/categories')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ name, emoji: '🏷️', color: '#2563eb', type });
+  if (res.status !== 201) {
+    throw new Error(`createCategory ${res.status}: ${JSON.stringify(res.body)}`);
+  }
+  return res.body.id as string;
+}
+
 describe('Transactions (e2e)', () => {
   let app: INestApplication;
   let tokenA: string;
@@ -35,52 +51,63 @@ describe('Transactions (e2e)', () => {
     await request(app.getHttpServer())
       .post('/api/transactions')
       .set('Authorization', `Bearer ${tokenA}`)
-      .send({ description: '', amount: -5, type: 'bogus', category: '' })
+      .send({ description: '', amount: -5, type: 'bogus' })
       .expect(400);
   });
 
-  it('creates, lists, updates and deletes a transaction for the owner', async () => {
-    const create = await request(app.getHttpServer())
+  it('rejects a categoryId owned by another user', async () => {
+    const foreignCategory = await createCategory(app, tokenB, `Foreign-${randomUUID().slice(0, 8)}`);
+    await request(app.getHttpServer())
+      .post('/api/transactions')
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ description: 'x', amount: 1, type: 'expense', categoryId: Number(foreignCategory) })
+      .expect(404);
+  });
+
+  it('creates a categorized transaction and an uncategorized one', async () => {
+    const categoryId = await createCategory(app, tokenA, `Work-${randomUUID().slice(0, 8)}`, 'income');
+
+    const categorized = await request(app.getHttpServer())
       .post('/api/transactions')
       .set('Authorization', `Bearer ${tokenA}`)
       .send({
         description: 'Salary',
         amount: 5000,
         type: 'income',
-        category: 'Work',
+        categoryId: Number(categoryId),
         date: '2026-08-01',
       })
       .expect(201);
-
-    expect(create.body).toMatchObject({
+    expect(categorized.body).toMatchObject({
       description: 'Salary',
       amount: 5000,
-      type: 'income',
-      category: 'Work',
-      date: '2026-08-01',
+      category: { id: categoryId, name: expect.stringContaining('Work') },
     });
-    const id = create.body.id as string;
 
-    const list = await request(app.getHttpServer())
-      .get('/api/transactions')
+    const uncategorized = await request(app.getHttpServer())
+      .post('/api/transactions')
       .set('Authorization', `Bearer ${tokenA}`)
-      .expect(200);
-    expect(list.body.some((t: { id: string }) => t.id === id)).toBe(true);
+      .send({ description: 'Found cash', amount: 20, type: 'income' })
+      .expect(201);
+    expect(uncategorized.body.category).toBeNull();
+  });
+
+  it('updates and deletes a transaction for the owner', async () => {
+    const create = await request(app.getHttpServer())
+      .post('/api/transactions')
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ description: 'Temp', amount: 10, type: 'expense', date: '2026-08-01' })
+      .expect(201);
+    const id = create.body.id as string;
 
     await request(app.getHttpServer())
       .put(`/api/transactions/${id}`)
       .set('Authorization', `Bearer ${tokenA}`)
-      .send({
-        description: 'Adjusted salary',
-        amount: 5500,
-        type: 'income',
-        category: 'Work',
-        date: '2026-08-01',
-      })
+      .send({ description: 'Adjusted', amount: 15, type: 'expense', date: '2026-08-01' })
       .expect(200)
       .expect(({ body }) => {
-        expect(body.description).toBe('Adjusted salary');
-        expect(body.amount).toBe(5500);
+        expect(body.description).toBe('Adjusted');
+        expect(body.amount).toBe(15);
       });
 
     await request(app.getHttpServer())
@@ -94,16 +121,33 @@ describe('Transactions (e2e)', () => {
       .expect(404);
   });
 
-  it("hides other users' transactions from list and blocks update/delete (ownership isolation)", async () => {
+  it('sets a transaction to uncategorized when its category is deleted', async () => {
+    const categoryId = await createCategory(app, tokenA, `Doomed-${randomUUID().slice(0, 8)}`, 'expense');
+    const tx = await request(app.getHttpServer())
+      .post('/api/transactions')
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ description: 'Thing', amount: 30, type: 'expense', categoryId: Number(categoryId) })
+      .expect(201);
+    const txId = tx.body.id as string;
+
+    await request(app.getHttpServer())
+      .delete(`/api/categories/${categoryId}`)
+      .set('Authorization', `Bearer ${tokenA}`)
+      .expect(204);
+
+    const list = await request(app.getHttpServer())
+      .get('/api/transactions')
+      .set('Authorization', `Bearer ${tokenA}`)
+      .expect(200);
+    const row = list.body.find((t: { id: string }) => t.id === txId);
+    expect(row.category).toBeNull();
+  });
+
+  it("hides other users' transactions and blocks update/delete (ownership isolation)", async () => {
     const create = await request(app.getHttpServer())
       .post('/api/transactions')
       .set('Authorization', `Bearer ${tokenA}`)
-      .send({
-        description: "User A's private",
-        amount: 100,
-        type: 'expense',
-        category: 'Personal',
-      })
+      .send({ description: "User A's private", amount: 100, type: 'expense' })
       .expect(201);
     const id = create.body.id as string;
 
@@ -116,12 +160,7 @@ describe('Transactions (e2e)', () => {
     await request(app.getHttpServer())
       .put(`/api/transactions/${id}`)
       .set('Authorization', `Bearer ${tokenB}`)
-      .send({
-        description: 'Attempt to change',
-        amount: 1,
-        type: 'expense',
-        category: 'Personal',
-      })
+      .send({ description: 'Attempt to change', amount: 1, type: 'expense' })
       .expect(404);
 
     await request(app.getHttpServer())

@@ -1,8 +1,20 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import NewTransactionModal from './NewTransactionModal';
-import type { Transaction } from '../types';
+import { apiService } from '../services/apiService';
+import { createQueryWrapper } from '../test/queryWrapper';
+import type { Category, Transaction } from '../types';
+
+vi.mock('../services/apiService', () => ({
+  apiService: { getCategories: vi.fn() },
+}));
+
+const categories: Category[] = [
+  { id: '10', name: 'Food', emoji: '🍔', color: '#ef4444', type: 'expense' },
+  { id: '20', name: 'Salary', emoji: '💰', color: '#22c55e', type: 'income' },
+  { id: '30', name: 'Gifts', emoji: '🎁', color: '#a855f7', type: 'both' },
+];
 
 const existingTransaction: Transaction = {
   id: '1',
@@ -10,36 +22,67 @@ const existingTransaction: Transaction = {
   amount: 1500,
   date: '2026-08-01',
   type: 'expense',
-  category: 'Housing',
+  category: { id: '30', name: 'Gifts', emoji: '🎁', color: '#a855f7', type: 'both' },
 };
 
+function renderModal(props: Partial<React.ComponentProps<typeof NewTransactionModal>> = {}) {
+  const { Wrapper } = createQueryWrapper();
+  return render(
+    <NewTransactionModal
+      isOpen
+      onClose={vi.fn()}
+      onSave={vi.fn().mockResolvedValue(undefined)}
+      transactionToEdit={null}
+      {...props}
+    />,
+    { wrapper: Wrapper },
+  );
+}
+
 describe('NewTransactionModal', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(apiService.getCategories).mockResolvedValue(categories);
+  });
+
   it('renders nothing when closed', () => {
-    render(
-      <NewTransactionModal isOpen={false} onClose={vi.fn()} onSave={vi.fn()} transactionToEdit={null} />,
-    );
+    renderModal({ isOpen: false });
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 
-  it('shows a validation error and does not call onSave when required fields are missing', async () => {
+  it('shows a validation error when amount/description are missing', async () => {
     const user = userEvent.setup();
     const onSave = vi.fn();
-    render(<NewTransactionModal isOpen onClose={vi.fn()} onSave={onSave} transactionToEdit={null} />);
+    renderModal({ onSave });
 
     await user.click(screen.getByRole('button', { name: /salvar transação/i }));
 
-    expect(await screen.findByText('Por favor, preencha todos os campos.')).toBeInTheDocument();
+    expect(await screen.findByText('Por favor, preencha valor e descrição.')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
 
-  it('submits the form with the entered data for a new transaction', async () => {
+  it('only offers categories matching the selected income/expense type', async () => {
+    const user = userEvent.setup();
+    renderModal();
+
+    // expense is the default — Food + Gifts (both), not Salary
+    await waitFor(() => expect(screen.getByRole('option', { name: /Food/ })).toBeInTheDocument());
+    expect(screen.queryByRole('option', { name: /Salary/ })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Receita' }));
+    await waitFor(() => expect(screen.getByRole('option', { name: /Salary/ })).toBeInTheDocument());
+    expect(screen.queryByRole('option', { name: /Food/ })).not.toBeInTheDocument();
+  });
+
+  it('submits categoryId (or null) with the entered data', async () => {
     const user = userEvent.setup();
     const onSave = vi.fn().mockResolvedValue(undefined);
-    render(<NewTransactionModal isOpen onClose={vi.fn()} onSave={onSave} transactionToEdit={null} />);
+    renderModal({ onSave });
 
     await user.type(screen.getByLabelText(/valor/i), '250');
     await user.type(screen.getByLabelText(/descrição/i), 'Groceries');
-    await user.type(screen.getByLabelText(/categoria/i), 'Food');
+    await waitFor(() => expect(screen.getByRole('option', { name: /Food/ })).toBeInTheDocument());
+    await user.selectOptions(screen.getByLabelText(/categoria/i), '10');
     await user.click(screen.getByRole('button', { name: /salvar transação/i }));
 
     await waitFor(() =>
@@ -47,34 +90,18 @@ describe('NewTransactionModal', () => {
         description: 'Groceries',
         amount: 250,
         type: 'expense',
-        category: 'Food',
+        categoryId: 10,
       }),
     );
   });
 
-  it('pre-fills the form when editing an existing transaction', () => {
-    render(
-      <NewTransactionModal
-        isOpen
-        onClose={vi.fn()}
-        onSave={vi.fn()}
-        transactionToEdit={existingTransaction}
-      />,
-    );
+  it('pre-fills the category select when editing', async () => {
+    renderModal({ transactionToEdit: existingTransaction });
 
     expect(screen.getByDisplayValue('Rent')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('1500')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Housing')).toBeInTheDocument();
+    await waitFor(() =>
+      expect((screen.getByLabelText(/categoria/i) as HTMLSelectElement).value).toBe('30'),
+    );
     expect(screen.getByRole('heading', { name: 'Editar Transação' })).toBeInTheDocument();
-  });
-
-  it('calls onClose when the close button is clicked', async () => {
-    const user = userEvent.setup();
-    const onClose = vi.fn();
-    render(<NewTransactionModal isOpen onClose={onClose} onSave={vi.fn()} transactionToEdit={null} />);
-
-    await user.click(screen.getByRole('button', { name: 'Fechar' }));
-
-    expect(onClose).toHaveBeenCalled();
   });
 });

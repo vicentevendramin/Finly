@@ -27,4 +27,12 @@ export class UsersService {
     });
     return this.usersRepository.save(user);
   }
+
+  async updateEmail(id: number, email: string): Promise<void> {
+    await this.usersRepository.update({ id }, { email: email.toLowerCase().trim() });
+  }
+
+  async updatePassword(id: number, passwordHash: string): Promise<void> {
+    await this.usersRepository.update({ id }, { passwordHash });
+  }
 }

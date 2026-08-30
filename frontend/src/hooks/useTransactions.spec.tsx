@@ -25,7 +25,7 @@ const mockTransaction: Transaction = {
   amount: 5000,
   date: '2026-08-01',
   type: 'income',
-  category: 'Work',
+  category: { id: '3', name: 'Work', emoji: '💼', color: '#22c55e', type: 'income' },
 };
 
 describe('useTransactions', () => {
@@ -51,11 +51,12 @@ describe('useTransactions', () => {
 
     const { result } = renderHook(() => useCreateTransaction(), { wrapper: Wrapper });
 
-    result.current.mutate({ description: 'Salary', amount: 5000, type: 'income', category: 'Work' });
+    result.current.mutate({ description: 'Salary', amount: 5000, type: 'income', categoryId: 3 });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['transactions'] });
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['goals'] });
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['reports'] });
   });
 
   it('invalidates caches after updating a transaction', async () => {
@@ -66,7 +67,7 @@ describe('useTransactions', () => {
     const { result } = renderHook(() => useUpdateTransaction(), { wrapper: Wrapper });
     result.current.mutate({
       id: '1',
-      data: { description: 'Salary', amount: 5500, type: 'income', category: 'Work' },
+      data: { description: 'Salary', amount: 5500, type: 'income', categoryId: 3 },
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

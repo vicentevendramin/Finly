@@ -4,6 +4,11 @@ import { Repository } from 'typeorm';
 import { Goal } from './entities/goal.entity.js';
 import { GoalContribution } from './entities/goal-contribution.entity.js';
 import { Transaction, TransactionType } from '../transactions/entities/transaction.entity.js';
+import { Category } from '../categories/entities/category.entity.js';
+import {
+  toCategoryResponse,
+  type CategoryResponse,
+} from '../categories/categories.service.js';
 import { CreateGoalDto } from './dto/create-goal.dto.js';
 import { UpdateGoalDto } from './dto/update-goal.dto.js';
 import { CreateContributionDto } from './dto/create-contribution.dto.js';
@@ -13,7 +18,7 @@ export interface GoalResponse {
   name: string;
   targetAmount: number;
   currentAmount: number;
-  category: string | null;
+  category: CategoryResponse | null;
   deadline: string | null;
 }
 
@@ -26,11 +31,14 @@ export class GoalsService {
     private readonly contributionsRepository: Repository<GoalContribution>,
     @InjectRepository(Transaction)
     private readonly transactionsRepository: Repository<Transaction>,
+    @InjectRepository(Category)
+    private readonly categoriesRepository: Repository<Category>,
   ) {}
 
   async findAll(userId: number): Promise<GoalResponse[]> {
     const goals = await this.goalsRepository.find({
       where: { user: { id: userId } },
+      relations: { tag: true },
       order: { createdAt: 'DESC' },
     });
     return Promise.all(goals.map((goal) => this.toResponse(userId, goal)));
@@ -46,7 +54,7 @@ export class GoalsService {
       user: { id: userId },
       name: dto.name.trim(),
       targetAmount: String(dto.targetAmount),
-      category: dto.category?.trim() || null,
+      tag: await this.resolveTag(userId, dto.categoryId),
       deadline: dto.deadline ?? null,
     });
     const saved = await this.goalsRepository.save(goal);
@@ -58,7 +66,9 @@ export class GoalsService {
 
     if (dto.name !== undefined) goal.name = dto.name.trim();
     if (dto.targetAmount !== undefined) goal.targetAmount = String(dto.targetAmount);
-    if (dto.category !== undefined) goal.category = dto.category?.trim() || null;
+    if (dto.categoryId !== undefined) {
+      goal.tag = await this.resolveTag(userId, dto.categoryId);
+    }
     if (dto.deadline !== undefined) goal.deadline = dto.deadline;
 
     const saved = await this.goalsRepository.save(goal);
@@ -90,9 +100,24 @@ export class GoalsService {
     return this.toResponse(userId, goal);
   }
 
+  private async resolveTag(
+    userId: number,
+    categoryId?: number | null,
+  ): Promise<Category | null> {
+    if (categoryId === undefined || categoryId === null) return null;
+    const category = await this.categoriesRepository.findOne({
+      where: { id: categoryId, user: { id: userId } },
+    });
+    if (!category) {
+      throw new NotFoundException('Category not found.');
+    }
+    return category;
+  }
+
   private async findOwnedGoal(userId: number, id: number): Promise<Goal> {
     const goal = await this.goalsRepository.findOne({
       where: { id, user: { id: userId } },
+      relations: { tag: true },
     });
     if (!goal) {
       throw new NotFoundException('Goal not found.');
@@ -107,7 +132,7 @@ export class GoalsService {
       name: goal.name,
       targetAmount: parseFloat(goal.targetAmount),
       currentAmount,
-      category: goal.category,
+      category: goal.tag ? toCategoryResponse(goal.tag) : null,
       deadline: goal.deadline,
     };
   }
@@ -120,12 +145,12 @@ export class GoalsService {
       .getRawOne<{ sum: string }>();
 
     let linkedIncomeSum = 0;
-    if (goal.category) {
+    if (goal.tag) {
       const incomeRow = await this.transactionsRepository
         .createQueryBuilder('t')
         .select('COALESCE(SUM(t.amount), 0)', 'sum')
         .where('t.user_id = :userId', { userId })
-        .andWhere('t.category = :category', { category: goal.category })
+        .andWhere('t.tag_id = :tagId', { tagId: goal.tag.id })
         .andWhere('t.type = :type', { type: TransactionType.INCOME })
         .getRawOne<{ sum: string }>();
       linkedIncomeSum = parseFloat(incomeRow?.sum ?? '0');

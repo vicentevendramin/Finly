@@ -2,16 +2,20 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 
-import CategoryChart from '../components/CategoryChart';
+import DashboardCategoryChart from '../components/DashboardCategoryChart';
 import GoalsList from '../components/GoalsList';
+import CategoryBadge from '../components/CategoryBadge';
 import { useDeleteTransaction, useTransactions } from '../hooks/useTransactions';
 import { useUiStore } from '../store/uiStore';
+import { useAuthStore } from '../store/authStore';
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
   const { data: transactions = [], isLoading } = useTransactions();
   const openEditModal = useUiStore((state) => state.openEditModal);
   const deleteTransaction = useDeleteTransaction();
+  const user = useAuthStore((state) => state.user);
+  const greetingName = user?.displayName || user?.email?.split('@')[0];
 
   const handleDelete = (id: string) => {
     if (window.confirm(t('common.confirmDeleteTransaction'))) {
@@ -34,7 +38,14 @@ const DashboardPage: React.FC = () => {
   const isNegativeBalance = !isLoading && summary.monthBalance < 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="space-y-6">
+      {greetingName && (
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+          {t('dashboard.greeting', { name: greetingName })}
+        </h2>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Main column (left) */}
       <div className="lg:col-span-2 space-y-8">
         {/* Summary cards */}
@@ -84,7 +95,7 @@ const DashboardPage: React.FC = () => {
                 <div key={tx.id} className="flex justify-between items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{tx.description}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{tx.category}</p>
+                    <span className="mt-1 inline-block"><CategoryBadge category={tx.category} /></span>
                   </div>
                   <div className="flex-shrink-0 ml-4">
                     <p className={`font-medium ${tx.type === 'income' ? 'text-success-600 dark:text-success-500' : 'text-danger-600 dark:text-danger-500'}`}>
@@ -116,8 +127,9 @@ const DashboardPage: React.FC = () => {
 
       {/* Side column (right) */}
       <div className="lg:col-span-1 space-y-8">
-        <CategoryChart />
+        <DashboardCategoryChart />
         <GoalsList />
+      </div>
       </div>
     </div>
   );

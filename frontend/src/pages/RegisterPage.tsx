@@ -6,7 +6,7 @@ import { useAuthStore } from '../store/authStore';
 import { labelClass, primaryButtonClass, textInputClass } from '../styles/formStyles';
 
 export default function RegisterPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const setUser = useAuthStore((state) => state.setUser);
   const [email, setEmail] = useState('');
@@ -31,7 +31,7 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     try {
-      const user = await apiService.register(email, password);
+      const user = await apiService.register(email, password, i18n.resolvedLanguage);
       setUser(user);
       navigate('/app/dashboard');
     } catch (err) {

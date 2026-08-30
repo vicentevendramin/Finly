@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDateString, IsOptional, IsPositive, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsPositive, IsString } from 'class-validator';
 
 export class UpdateGoalDto {
   @IsOptional()
@@ -12,8 +12,9 @@ export class UpdateGoalDto {
   targetAmount?: number;
 
   @IsOptional()
-  @IsString()
-  category?: string | null;
+  @Type(() => Number)
+  @IsInt({ message: 'categoryId must be a category id.' })
+  categoryId?: number | null;
 
   @IsOptional()
   @IsDateString()

@@ -11,10 +11,15 @@ export interface BalancePeriod {
   balance: number;
 }
 
-export interface CategoryTotal {
-  category: string;
+export interface CategoryBreakdownRow {
+  categoryId: string | null;
+  name: string | null;
+  color: string | null;
+  emoji: string | null;
   total: number;
 }
+
+const UNCATEGORIZED_LABEL = 'Uncategorized';
 
 export interface ExportResult {
   buffer: Buffer;
@@ -71,16 +76,35 @@ export class ReportsService {
     type: TransactionType = TransactionType.EXPENSE,
     from?: string,
     to?: string,
-  ): Promise<CategoryTotal[]> {
+  ): Promise<CategoryBreakdownRow[]> {
     const rows = await this.baseQuery(userId, from, to)
       .andWhere('t.type = :type', { type })
-      .select('t.category', 'category')
+      .leftJoin('t.tag', 'tag')
+      .select('tag.id', 'categoryId')
+      .addSelect('tag.name', 'name')
+      .addSelect('tag.color', 'color')
+      .addSelect('tag.emoji', 'emoji')
       .addSelect('COALESCE(SUM(t.amount), 0)', 'total')
-      .groupBy('t.category')
+      .groupBy('tag.id')
+      .addGroupBy('tag.name')
+      .addGroupBy('tag.color')
+      .addGroupBy('tag.emoji')
       .orderBy('total', 'DESC')
-      .getRawMany<{ category: string; total: string }>();
+      .getRawMany<{
+        categoryId: number | null;
+        name: string | null;
+        color: string | null;
+        emoji: string | null;
+        total: string;
+      }>();
 
-    return rows.map((row) => ({ category: row.category, total: parseFloat(row.total) }));
+    return rows.map((row) => ({
+      categoryId: row.categoryId != null ? String(row.categoryId) : null,
+      name: row.name ?? null,
+      color: row.color ?? null,
+      emoji: row.emoji ?? null,
+      total: parseFloat(row.total),
+    }));
   }
 
   async exportTransactions(
@@ -90,12 +114,13 @@ export class ReportsService {
     to?: string,
   ): Promise<ExportResult> {
     const rawTransactions = await this.baseQuery(userId, from, to)
+      .leftJoin('t.tag', 'tag')
       .select('t.id', 'id')
       .addSelect('t.description', 'description')
       .addSelect('t.amount', 'amount')
       .addSelect('t.date', 'date')
       .addSelect('t.type', 'type')
-      .addSelect('t.category', 'category')
+      .addSelect('tag.name', 'category')
       .orderBy('t.date', 'ASC')
       .getRawMany<{
         id: number;
@@ -103,14 +128,16 @@ export class ReportsService {
         amount: string;
         date: string | Date;
         type: TransactionType;
-        category: string;
+        category: string | null;
       }>();
 
     // pg returns `date`-typed columns as JS Date objects when read via a raw
     // query (unlike TypeORM's entity/repository layer, which normalizes them
-    // to plain strings) — normalize to YYYY-MM-DD here.
+    // to plain strings) — normalize to YYYY-MM-DD here. Uncategorized rows have
+    // a null category name.
     const transactions = rawTransactions.map((t) => ({
       ...t,
+      category: t.category ?? UNCATEGORIZED_LABEL,
       date: t.date instanceof Date ? t.date.toISOString().split('T')[0] : t.date,
     }));
 
