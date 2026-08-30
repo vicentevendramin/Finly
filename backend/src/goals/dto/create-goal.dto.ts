@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDateString, IsNotEmpty, IsOptional, IsPositive, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsNotEmpty, IsOptional, IsPositive } from 'class-validator';
 
 export class CreateGoalDto {
   @IsNotEmpty({ message: 'The goal name is required.' })
@@ -9,9 +9,11 @@ export class CreateGoalDto {
   @IsPositive({ message: 'targetAmount must be a positive number.' })
   targetAmount: number;
 
+  /** Optional category link, by id. */
   @IsOptional()
-  @IsString()
-  category?: string;
+  @Type(() => Number)
+  @IsInt({ message: 'categoryId must be a category id.' })
+  categoryId?: number | null;
 
   @IsOptional()
   @IsDateString()

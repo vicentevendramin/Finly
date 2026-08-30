@@ -7,9 +7,11 @@ function buildQueryBuilder(overrides: Record<string, unknown> = {}) {
   const qb = {
     where: vi.fn().mockReturnThis(),
     andWhere: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
     addSelect: vi.fn().mockReturnThis(),
     groupBy: vi.fn().mockReturnThis(),
+    addGroupBy: vi.fn().mockReturnThis(),
     orderBy: vi.fn().mockReturnThis(),
     getRawMany: vi.fn().mockResolvedValue([]),
     ...overrides,
@@ -43,11 +45,11 @@ describe('ReportsService', () => {
     ]);
   });
 
-  it('maps category breakdown rows to numbers', async () => {
+  it('maps category breakdown rows, keeping colour/emoji and a null bucket', async () => {
     const qb = buildQueryBuilder({
       getRawMany: vi.fn().mockResolvedValue([
-        { category: 'Food', total: '250.75' },
-        { category: 'Transport', total: '120.00' },
+        { categoryId: 3, name: 'Food', color: '#ef4444', emoji: '🍔', total: '250.75' },
+        { categoryId: null, name: null, color: null, emoji: null, total: '40.00' },
       ]),
     });
     repo.createQueryBuilder.mockReturnValue(qb);
@@ -55,8 +57,8 @@ describe('ReportsService', () => {
     const result = await service.getCategoryBreakdown(10, TransactionType.EXPENSE);
 
     expect(result).toEqual([
-      { category: 'Food', total: 250.75 },
-      { category: 'Transport', total: 120 },
+      { categoryId: '3', name: 'Food', color: '#ef4444', emoji: '🍔', total: 250.75 },
+      { categoryId: null, name: null, color: null, emoji: null, total: 40 },
     ]);
     expect(qb.andWhere).toHaveBeenCalledWith('t.type = :type', {
       type: TransactionType.EXPENSE,
@@ -84,6 +86,26 @@ describe('ReportsService', () => {
     const csv = result.buffer.toString('utf-8');
     expect(csv).toContain('id,description,amount,date,type,category');
     expect(csv).toContain('"Lunch, with salad"');
+  });
+
+  it('labels an uncategorized (null tag) row as "Uncategorized" in the export', async () => {
+    const qb = buildQueryBuilder({
+      getRawMany: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          description: 'Cash',
+          amount: '10.00',
+          date: '2026-08-01',
+          type: TransactionType.EXPENSE,
+          category: null,
+        },
+      ]),
+    });
+    repo.createQueryBuilder.mockReturnValue(qb);
+
+    const result = await service.exportTransactions(10, 'csv');
+
+    expect(result.buffer.toString('utf-8')).toContain('Uncategorized');
   });
 
   it('normalizes a raw Date object in the date column to YYYY-MM-DD', async () => {

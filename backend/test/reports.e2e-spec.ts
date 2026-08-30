@@ -20,6 +20,18 @@ describe('Reports (e2e)', () => {
     app = await bootstrapTestApp();
     token = await registerAndLogin(app, `e2e-reports-${randomUUID()}@example.com`);
 
+    const category = async (name: string, type: 'income' | 'expense' | 'both') => {
+      const res = await request(app.getHttpServer())
+        .post('/api/categories')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name, emoji: '🏷️', color: '#2563eb', type })
+        .expect(201);
+      return Number(res.body.id);
+    };
+    const work = await category(`Work-${randomUUID().slice(0, 8)}`, 'income');
+    const housing = await category(`Housing-${randomUUID().slice(0, 8)}`, 'expense');
+    const food = await category(`Food-${randomUUID().slice(0, 8)}`, 'expense');
+
     const tx = (body: Record<string, unknown>) =>
       request(app.getHttpServer())
         .post('/api/transactions')
@@ -27,34 +39,10 @@ describe('Reports (e2e)', () => {
         .send(body)
         .expect(201);
 
-    await tx({
-      description: 'Salary',
-      amount: 5000,
-      type: 'income',
-      category: 'Work',
-      date: '2026-07-05',
-    });
-    await tx({
-      description: 'Rent',
-      amount: 1500,
-      type: 'expense',
-      category: 'Housing',
-      date: '2026-07-10',
-    });
-    await tx({
-      description: 'Groceries',
-      amount: 400,
-      type: 'expense',
-      category: 'Food',
-      date: '2026-07-15',
-    });
-    await tx({
-      description: 'Freelance',
-      amount: 800,
-      type: 'income',
-      category: 'Work',
-      date: '2026-08-01',
-    });
+    await tx({ description: 'Salary', amount: 5000, type: 'income', categoryId: work, date: '2026-07-05' });
+    await tx({ description: 'Rent', amount: 1500, type: 'expense', categoryId: housing, date: '2026-07-10' });
+    await tx({ description: 'Groceries', amount: 400, type: 'expense', categoryId: food, date: '2026-07-15' });
+    await tx({ description: 'Freelance', amount: 800, type: 'income', categoryId: work, date: '2026-08-01' });
   });
 
   afterAll(async () => {
@@ -87,8 +75,8 @@ describe('Reports (e2e)', () => {
 
     expect(res.body).toEqual(
       expect.arrayContaining([
-        { category: 'Housing', total: 1500 },
-        { category: 'Food', total: 400 },
+        expect.objectContaining({ name: expect.stringContaining('Housing'), total: 1500 }),
+        expect.objectContaining({ name: expect.stringContaining('Food'), total: 400 }),
       ]),
     );
   });

@@ -64,11 +64,19 @@ describe('Goals (e2e)', () => {
   });
 
   it('combines manual contributions with linked-category income transactions (hybrid model)', async () => {
+    const cat = await request(app.getHttpServer())
+      .post('/api/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: `Travel-${randomUUID().slice(0, 8)}`, emoji: '✈️', color: '#3b82f6', type: 'both' })
+      .expect(201);
+    const categoryId = Number(cat.body.id);
+
     const create = await request(app.getHttpServer())
       .post('/api/goals')
       .set('Authorization', `Bearer ${token}`)
-      .send({ name: 'Dream trip', targetAmount: 5000, category: 'Travel-e2e' })
+      .send({ name: 'Dream trip', targetAmount: 5000, categoryId })
       .expect(201);
+    expect(create.body.category).toMatchObject({ id: cat.body.id });
     const id = create.body.id as string;
 
     await request(app.getHttpServer())
@@ -80,24 +88,14 @@ describe('Goals (e2e)', () => {
     await request(app.getHttpServer())
       .post('/api/transactions')
       .set('Authorization', `Bearer ${token}`)
-      .send({
-        description: 'Bonus',
-        amount: 300,
-        type: 'income',
-        category: 'Travel-e2e',
-      })
+      .send({ description: 'Bonus', amount: 300, type: 'income', categoryId })
       .expect(201);
 
     // An expense in the same category must NOT count toward progress.
     await request(app.getHttpServer())
       .post('/api/transactions')
       .set('Authorization', `Bearer ${token}`)
-      .send({
-        description: 'Ticket',
-        amount: 999,
-        type: 'expense',
-        category: 'Travel-e2e',
-      })
+      .send({ description: 'Ticket', amount: 999, type: 'expense', categoryId })
       .expect(201);
 
     await request(app.getHttpServer())

@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsPositive,
@@ -9,7 +10,7 @@ import {
 import { TransactionType } from '../entities/transaction.entity.js';
 
 export class CreateTransactionDto {
-  @IsNotEmpty({ message: 'Required fields: description, amount, type, category.' })
+  @IsNotEmpty({ message: 'Required fields: description, amount, type.' })
   description: string;
 
   @Type(() => Number)
@@ -23,6 +24,9 @@ export class CreateTransactionDto {
   @IsEnum(TransactionType, { message: 'type must be "income" or "expense".' })
   type: TransactionType;
 
-  @IsNotEmpty({ message: 'Required fields: description, amount, type, category.' })
-  category: string;
+  /** Category id, or null/omitted for an uncategorized transaction. */
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: 'categoryId must be a category id.' })
+  categoryId?: number | null;
 }
