@@ -64,7 +64,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg z-50 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
             {categoryToEdit ? t('categoryModal.editTitle') : t('categoryModal.newTitle')}
@@ -82,7 +82,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
           <div className="space-y-4">
             <div className="flex gap-4">
               {/* Emoji */}
-              <div className="relative">
+              <div>
                 <label className={`${labelClass} mb-1`}>{t('categoryModal.emojiLabel')}</label>
                 <button
                   type="button"
@@ -91,19 +91,6 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                 >
                   {emoji}
                 </button>
-                {showPicker && (
-                  <div className="absolute z-10 mt-2">
-                    <Suspense fallback={null}>
-                      <EmojiPicker
-                        onSelect={(e) => {
-                          setEmoji(e);
-                          setShowPicker(false);
-                        }}
-                        onClickOutside={() => setShowPicker(false)}
-                      />
-                    </Suspense>
-                  </div>
-                )}
               </div>
 
               {/* Colour */}
@@ -129,6 +116,19 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                 </div>
               </div>
             </div>
+
+            {showPicker && (
+              <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                <Suspense fallback={null}>
+                  <EmojiPicker
+                    onSelect={(e) => {
+                      setEmoji(e);
+                      setShowPicker(false);
+                    }}
+                  />
+                </Suspense>
+              </div>
+            )}
 
             {/* Name */}
             <div>
